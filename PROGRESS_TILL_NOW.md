@@ -1,4 +1,4 @@
-# Meeting Brief — everything explained
+# Progress Till Now — everything explained
 
 ## The 30-second version
 
