@@ -48,7 +48,9 @@ PLAN.md            phase checklist — update as phases complete
 
 ## Conventions
 
-- Python 3.11, `uv` or venv, pinned `requirements.txt`.
+- Python 3.14 (`.venv/`), pinned `requirements.txt`. Pins are the versions
+  actually resolved and verified locally — match them exactly, since feature
+  values must be comparable across all five machines.
 - All logic in `ser/` as importable modules. Notebooks import from `ser/`, never
   define functions.
 - Type hints on all public functions. Docstrings state what is fit on train only.
@@ -60,16 +62,35 @@ PLAN.md            phase checklist — update as phases complete
 
 ## Data facts (assert these, don't assume them)
 
+Verified against the actual files on 2026-08-22. Where this copy of RAVDESS
+differs from the canonical distribution, the divergence is marked ⚠.
+
 - 1,440 files total. 96 neutral, 192 each of the other seven emotions.
 - Neutral has half because there is no strong-intensity neutral recording.
-- Filename is 7 hyphen-separated fields:
-  modality-vocalchannel-emotion-intensity-statement-repetition-actor
-  e.g. `03-01-06-01-02-01-12.wav`
+- ⚠ Layout is `data/data/PersonNN/` (note the doubled `data`), **not**
+  `Actor_NN/`. 24 folders, exactly 60 clips each.
+- ⚠ Filename is **5** hyphen-separated fields, not the canonical 7:
+  emotion-intensity-statement-repetition-actor
+  e.g. `06-02-01-02-12.wav`
+  The constant `modality` (03) and `vocalchannel` (01) fields were stripped
+  when this copy was repackaged. `ser/metadata.py` re-adds them as constant
+  columns, so the parsed DataFrame matches the canonical RAVDESS shape.
+  The parser **rejects** 7-field names rather than mis-parsing them.
 - Emotion codes: 01 neutral, 02 calm, 03 happy, 04 sad, 05 angry, 06 fearful,
   07 disgust, 08 surprised.
 - Intensity: 01 normal, 02 strong. Statement: 01 "kids", 02 "dogs".
-- Actor 01–24. **Odd = male, even = female.**
+- Actor 01–24. **Odd = male, even = female.** The actor is encoded twice —
+  field 5 and the `PersonNN` folder — and they agree in all 1,440 files.
 - Actors are the grouping variable for all speaker-independent splits.
+
+Audio properties (measured, see `docs/data_audit.md`):
+
+- WAV PCM_16 at **48 000 Hz**, uniform across all 1,440 files. Note that
+  `librosa.load()` silently resamples to 22 050 Hz — **always pass `sr=`.**
+- ⚠ 5 files are dual-channel, not mono as originally assumed. Both channels
+  are bit-identical, so `mono=True` at load handles them. The raw files are
+  left untouched.
+- Duration 2.94–5.27 s (median 3.67). No zero-length or corrupt files.
 
 ## Metrics
 
