@@ -9,3 +9,9 @@ matplotlib==3.11.1
 seaborn==0.13.2
 pyarrow==25.0.1
 pytest==9.1.1
+
+# Notebook tooling -- needed to run and re-execute notebooks/
+jupyterlab==4.6.3
+nbformat==5.11.1
+nbconvert==7.17.1
+ipykernel==7.3.0

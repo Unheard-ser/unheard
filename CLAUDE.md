@@ -45,6 +45,7 @@ ser/
   evaluate.py      the single scoring function everyone calls
   models/          one module per model family
 notebooks/         exploration and figures only — no logic lives here
+  00_project_walkthrough.ipynb  the guided tour: START HERE to onboard
 splits/folds.csv   committed, frozen
 results/results.csv appended by evaluate.py
 figures/           saved plots for the deck
