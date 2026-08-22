@@ -30,6 +30,36 @@ which means the interesting findings are about *structure*, not damage.
 
 ## 2. What is not
 
+### 2.0 The on-disk folder layout
+
+Recorded exactly, because it differs from what CLAUDE.md originally described
+and every loader in `ser/` depends on it.
+
+```
+data/                          <- gitignored
+└── data/                      <- note the doubled segment; this is DATA_ROOT
+    ├── Person01/
+    │   ├── 01-01-01-01-01.wav
+    │   ├── 01-01-01-02-01.wav
+    │   └── ...                (60 files)
+    ├── Person02/              (60 files)
+    ├── ...
+    └── Person24/              (60 files)
+```
+
+| Property | Value |
+|---|---|
+| Root used by code | `data/data/` — `ser.metadata.DATA_ROOT` |
+| Actor directories | 24, named `Person01` … `Person24` (zero-padded, no underscore) |
+| Files per directory | exactly 60 |
+| Nesting below actor level | none — the tree is exactly two levels deep |
+| File types present | `.wav` only, 1,440 of them; no stray metadata or index files |
+
+Two divergences from the canonical RAVDESS distribution, both marked ⚠ in
+CLAUDE.md: the doubled `data/data/` segment, and `PersonNN` rather than
+`Actor_NN`. Neither affects the data — the actor is also encoded as filename
+field 5, and the two agree in all 1,440 files.
+
 ### 2.1 The filename schema is not the canonical one
 
 Files carry **5** hyphen-separated fields, not RAVDESS's 7:
@@ -174,14 +204,35 @@ Any call that omits `sr=` produces a resampled artifact that matches neither the
 source nor our target. Every load in `ser/` passes `sr=` explicitly; `ser/audit.py`
 uses `sr=None` precisely so this document describes the true files.
 
-### Decision 4 — Downmix to mono at load; never edit the raw files
+### Decision 4 — Average all channels to mono at load time, via one shared function
 
-*Evidence:* 5 dual-channel files, channels bit-identical (§2.2).
+*Evidence:* 5 dual-channel files, channels bit-identical, `max|L−R| = 0.0` (§2.2).
 
-`librosa.load(..., mono=True)` averages identical channels — a mathematical no-op
-here — and is idempotent for the other 1,435. One code path, no special-casing,
-and `data/` stays pristine and gitignored. Rewriting 5 files on disk would make
-every teammate's copy silently differ from the source.
+**The decision, stated precisely:** every clip is loaded through
+`ser.preprocess.load_audio`, which calls `librosa.load(..., mono=True)`. That
+averages across channels, so a dual-channel file becomes `(L + R) / 2`. Because
+the two channels are bit-identical, this evaluates to the original signal
+exactly — verified in `tests/test_preprocess.py`, which asserts the downmixed
+array matches channel 0 to within 1e-7. For the other 1,435 files the signal is
+already 1-D and the call is a pass-through.
+
+**Alternatives rejected:**
+
+| Option | Why not |
+|---|---|
+| Take the left channel only | Identical result here, but silently wrong if a future re-download has genuinely differing channels. Averaging degrades gracefully; channel-picking does not. |
+| Special-case the 5 files by name | A hardcoded list rots the moment the dataset copy changes, and adds a branch that is untested 1,435 times out of 1,440. |
+| Rewrite the 5 files on disk as mono | Mutates the only copy of the raw data. Every teammate would need to run the identical rewrite or their `data/` silently differs — and `data/` is gitignored, so the divergence would be invisible. |
+| Drop the 5 files | Discards real data and breaks the exactly-60-clips-per-actor invariant for actors 01, 05 and 20. |
+
+**Enforcement.** `load_audio` is the single audio entry point for the project —
+`ser/audit.py` already routes through it, and `ser/features.py` will in Phase 4.
+Having one function is what makes this decision and Decision 3 actually hold
+everywhere instead of being re-decided at each call site. `channel_report` in the
+same module measures channel divergence without downmixing, and a slow test
+asserts across all 1,440 files that exactly five are dual-channel and all five
+still have `max_channel_diff == 0.0`. If a re-download breaks that, the
+lossless-downmix justification fails loudly rather than quietly becoming untrue.
 
 ---
 

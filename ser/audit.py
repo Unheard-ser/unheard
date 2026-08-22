@@ -20,6 +20,7 @@ import pandas as pd
 import soundfile as sf
 
 from ser.metadata import load as load_metadata
+from ser.preprocess import load_audio
 
 #: Silence threshold in dB below peak, passed to ``librosa.effects.trim``.
 #: A parameter rather than a constant because Phase 4 sweeps it.
@@ -84,8 +85,10 @@ def probe_file(path: str | Path, top_db: int = DEFAULT_TOP_DB) -> dict[str, obje
             n_frames=int(info.frames),
         )
 
-        # sr=None preserves the native rate; mono=True averages channels.
-        y, sr = librosa.load(str(path), sr=None, mono=True)
+        # sr=None keeps the native rate: the audit must describe the true
+        # files, not a resampled version. The mono downmix is the shared
+        # project-wide one from ser.preprocess.
+        y, sr = load_audio(path, sr=None, mono=True)
         duration = len(y) / sr if sr else np.nan
         peak = float(np.abs(y).max()) if y.size else 0.0
         rms = float(np.sqrt(np.mean(y**2))) if y.size else 0.0

@@ -3,6 +3,33 @@
 One phase per Claude Code session. Enter plan mode, approve, execute, run the
 gate check, commit, then move on. Do not start a phase before its gate passes.
 
+## ⚠ Execution order changed: Phase 3 runs BEFORE Phase 2
+
+**Decided 2026-08-22.** The numbered phases below are kept as written for
+traceability, but the actual order is **0 → 1 → 3 → 2 → 4 → …**
+
+**Why.** Rigorous measurement is this project's central claim. EDA inspects the
+data directly, so running it across all 1,440 clips before the folds exist means
+looking at held-out data before the experiment is designed. Even with no model
+fitted, that leaks through the analyst: every choice made afterwards — which
+features to try, which classes to focus on, which confusions to chase — is
+informed by the test set. It is unquantifiable and unfixable after the fact, and
+it undercuts exactly the claim the report is built on.
+
+Building the frozen folds first means Phase 2 EDA can be restricted to training
+folds only, and any figure that must use all the data is a deliberate, labelled
+exception rather than an accident.
+
+**Consequences:**
+- Phase 2 EDA runs on **training folds only**. The note already in Phase 2
+  ("run EDA on training folds only once Phase 3 exists") becomes binding rather
+  than aspirational.
+- The 2-D projection coloured by actor (the leakage story) still needs all
+  actors to be meaningful. Produce it on training folds, and label any
+  all-data version explicitly as a diagnostic, not as evidence for a result.
+- Class-balance and per-emotion count charts are properties of the corpus, not
+  of the test signal, and may use all 1,440 — stated as such in the caption.
+
 ---
 
 ## Phase 0 — Foundation
@@ -35,8 +62,10 @@ justified by evidence, not convention.
 ---
 
 ## Phase 2 — EDA and visualisation  → *EDA 10 + Visualization 10*
-Note: run EDA on training folds only once Phase 3 exists; for now use all data
-but flag anything you would need to redo.
+**Runs AFTER Phase 3.** See the reordering note at the top of this file.
+Binding: EDA uses **training folds only**. Corpus-level counts (class balance)
+may use all 1,440 and must say so in the caption; anything that touches signal
+— pitch, energy, duration, projections — is restricted to training folds.
 - [ ] Class balance chart, with the neutral explanation annotated
 - [ ] Waveform + mel-spectrogram grid: one representative clip per emotion
 - [ ] Pitch (F0) distribution by emotion; energy/RMS distribution by emotion
@@ -53,7 +82,7 @@ attached earns nothing.
 
 ---
 
-## Phase 3 — Frozen evaluation harness
+## Phase 3 — Frozen evaluation harness  *(runs BEFORE Phase 2)*
 - [ ] `ser/splits.py` defines three protocols:
       - `speaker_independent` — 5-fold GroupKFold grouped by actor
       - `random_stratified` — 5-fold StratifiedKFold (leakage comparison only)

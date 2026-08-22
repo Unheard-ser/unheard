@@ -3,7 +3,7 @@
 ## Project
 
 ISB AMPBA foundation project. Multi-class speech emotion recognition on RAVDESS:
-1,440 mono .wav clips, 24 actors, 8 emotion classes. Team of 5. Graded submission.
+1,440 .wav clips, 24 actors, 8 emotion classes. Team of 5. Graded submission.
 
 Deadlines: Mid review 6 Sep 2026. Final review 4 Oct 2026.
 Business framing: contact-centre / telecaller QA and CSAT prediction.
@@ -32,7 +32,8 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
 
 ```
 ser/
-  metadata.py      parse the 7-field RAVDESS filename into a DataFrame
+  metadata.py      parse the 5-field filename into a DataFrame (see Data facts)
+  preprocess.py    load_audio() — THE single audio entry point: mono + 16 kHz
   audit.py         integrity checks on the raw audio
   eda.py           plotting functions (return figures, never call plt.show)
   splits.py        fold definitions — frozen, written to splits/folds.csv
@@ -88,8 +89,12 @@ Audio properties (measured, see `docs/data_audit.md`):
 - WAV PCM_16 at **48 000 Hz**, uniform across all 1,440 files. Note that
   `librosa.load()` silently resamples to 22 050 Hz — **always pass `sr=`.**
 - ⚠ 5 files are dual-channel, not mono as originally assumed. Both channels
-  are bit-identical, so `mono=True` at load handles them. The raw files are
-  left untouched.
+  are bit-identical, so averaging is lossless. The raw files are left untouched.
+- **Never call `librosa.load` directly. Use `ser.preprocess.load_audio`.**
+  It is the one entry point that applies the mono downmix and the 16 kHz
+  target rate, so those decisions hold everywhere instead of being re-decided
+  per call site. Pass `sr=None` only when you deliberately need native rate
+  (the audit does).
 - Duration 2.94–5.27 s (median 3.67). No zero-length or corrupt files.
 
 ## Metrics
