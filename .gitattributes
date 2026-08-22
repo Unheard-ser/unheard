@@ -1,0 +1,7 @@
+# The frozen fold contract must be byte-identical on every machine.
+# Without this, Windows checkouts would rewrite line endings and teammates
+# on macOS/Linux would hold a different file than the one that was frozen.
+splits/folds.csv text eol=lf
+results/results.csv text eol=lf
+*.py text eol=lf
+*.md text eol=lf

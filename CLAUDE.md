@@ -10,7 +10,11 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
 
 ## Non-negotiable rules
 
-1. **Never modify `splits/folds.csv` once committed.** Every experiment by every
+1. **Never modify `splits/folds.csv` once committed.** Frozen 2026-08-22;
+   `write_folds()` raises on an existing file and a test guards it.
+   Four protocols — see `docs/splits.md`. Headline metric is POOLED
+   out-of-fold, not the mean of per-fold metrics (folds are unequal).
+   Every experiment by every
    team member uses those exact fold assignments. This is the contract that makes
    five people's results comparable. If you believe a split is wrong, stop and ask.
 2. **Never fit anything on test data.** Scalers, PCA, feature selection, class
@@ -36,7 +40,7 @@ ser/
   preprocess.py    load_audio() — THE single audio entry point: mono + 16 kHz
   audit.py         integrity checks on the raw audio
   eda.py           plotting functions (return figures, never call plt.show)
-  splits.py        fold definitions — frozen, written to splits/folds.csv
+  splits.py        4 protocols — FROZEN in splits/folds.csv, never regenerate
   features.py      feature extraction, parameterised (see below)
   evaluate.py      the single scoring function everyone calls
   models/          one module per model family

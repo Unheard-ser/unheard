@@ -83,20 +83,26 @@ attached earns nothing.
 ---
 
 ## Phase 3 — Frozen evaluation harness  *(runs BEFORE Phase 2)*
-- [ ] `ser/splits.py` defines three protocols:
+- [x] `ser/splits.py` defines three protocols:
       - `speaker_independent` — 5-fold GroupKFold grouped by actor
       - `random_stratified` — 5-fold StratifiedKFold (leakage comparison only)
       - `statement_holdout` — train statement 01, test statement 02
-- [ ] Fold assignments written to `splits/folds.csv` and committed
-- [ ] Test asserting no actor appears in both sides of any speaker-independent fold
-- [ ] `ser/evaluate.py`: one function, returns accuracy, macro-F1, per-class
+      - `statement_holdout_si` — ADDED: the speaker-disjoint variant, so the
+        gap between the two isolates lexical generalisation from speaker
+        memorisation (see docs/splits.md)
+- [x] Fold assignments written to `splits/folds.csv` and committed
+- [x] Test asserting no actor appears in both sides of any speaker-independent fold
+- [x] `ser/evaluate.py`: one function, returns accuracy, macro-F1, per-class
       precision/recall/F1, confusion matrix, plus slices by gender / intensity /
       emotion; appends one row to `results/results.csv`
-- [ ] `results.csv` schema: run_id, timestamp, owner, protocol, fold, feature_config,
+- [x] `results.csv` schema: run_id, timestamp, owner, protocol, fold, feature_config,
       model, hyperparams (json), accuracy, macro_f1, notes
 
-**Gate:** two different models scored through `evaluate.py` produce comparable
-rows. Announce to the team that folds are frozen.
+**Gate:** PASSED 2026-08-22. Two synthetic models scored through `evaluate.py`
+produced comparable rows (pooled acc 0.735 vs 0.303, identical schema).
+Headline metric is POOLED out-of-fold, not the mean of per-fold metrics —
+folds are unequal (300/300/300/300/240) so averaging over-weights the small
+fold. **Folds are frozen — announce to the team.** See docs/splits.md.
 
 ---
 
