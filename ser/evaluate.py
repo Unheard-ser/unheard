@@ -116,18 +116,28 @@ def _slice_metrics(
         mask = (groups == level).to_numpy()
         if not mask.any():
             continue
+        true_here = y_true[mask]
+        # Macro-F1 is only meaningful when the slice contains more than one
+        # true class. Slicing by emotion gives single-class subsets, where
+        # averaging F1 over the seven absent classes produces a number that
+        # looks like a score but is not one. Accuracy there equals recall.
+        multiclass = len(set(true_here.tolist())) > 1
         rows.append(
             {
                 "level": level,
                 "n": int(mask.sum()),
-                "accuracy": float(accuracy_score(y_true[mask], y_pred[mask])),
-                "macro_f1": float(
-                    f1_score(
-                        y_true[mask],
-                        y_pred[mask],
-                        average="macro",
-                        zero_division=0,
+                "accuracy": float(accuracy_score(true_here, y_pred[mask])),
+                "macro_f1": (
+                    float(
+                        f1_score(
+                            true_here,
+                            y_pred[mask],
+                            average="macro",
+                            zero_division=0,
+                        )
                     )
+                    if multiclass
+                    else float("nan")
                 ),
             }
         )

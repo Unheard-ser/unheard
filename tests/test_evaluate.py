@@ -262,3 +262,15 @@ def test_metadata_length_mismatch_raises(meta, results):
             truth, truth, "speaker_independent", 0, meta.iloc[:10],
             model="m", feature_config="f", results_path=results,
         )
+
+
+def test_single_class_slice_reports_nan_macro_f1(meta, results):
+    """Macro-F1 over a one-class subset averages 7 absent classes -- not a score."""
+    truth = meta["emotion_label"].tolist()
+    out = _score(meta, truth, truth, results)
+    by_emotion = out["slices"]["emotion_label"]
+    assert by_emotion["macro_f1"].isna().all()
+    assert (by_emotion["accuracy"] == 1.0).all()
+
+    by_gender = out["slices"]["gender"]
+    assert by_gender["macro_f1"].notna().all()
