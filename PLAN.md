@@ -6,26 +6,27 @@ gate check, commit, then move on. Do not start a phase before its gate passes.
 ---
 
 ## Phase 0 — Foundation
-- [ ] Repo initialised, `.gitignore` excludes `data/`, `features/`, `__pycache__`
-- [ ] `requirements.txt` pinned; environment reproducible from scratch
-- [ ] `CLAUDE.md` committed
-- [ ] `ser/metadata.py` parses all 7 filename fields into a DataFrame
-- [ ] Asserts pass: 1,440 rows, 96 neutral, 192 each other class, 24 actors,
+- [x] Repo initialised, `.gitignore` excludes `data/`, `features/`, `__pycache__`
+- [x] `requirements.txt` pinned; environment reproducible from scratch
+- [x] `CLAUDE.md` committed
+- [x] `ser/metadata.py` parses all filename fields into a DataFrame
+      (5 fields as packaged, not 7 — see CLAUDE.md Data facts)
+- [x] Asserts pass: 1,440 rows, 96 neutral, 192 each other class, 24 actors,
       12 male / 12 female, no strong-intensity neutral
-- [ ] pytest covering those invariants
+- [x] pytest covering those invariants
 
 **Gate:** `pytest` green, and `python -c "from ser.metadata import load; print(load().shape)"` prints (1440, N).
 
 ---
 
 ## Phase 1 — Data audit  → *Data Understanding, 10 marks*
-- [ ] Every file loads without error; corrupt or zero-length files listed
-- [ ] Sample rate, bit depth, channel count per file — report any inconsistency
-- [ ] Duration distribution overall and per emotion
-- [ ] Leading/trailing silence measured; proportion of each clip that is silence
-- [ ] Amplitude range; any clipping detected
-- [ ] Per-actor clip counts (expect 60 each)
-- [ ] Written `docs/data_audit.md` stating what is clean, what is not, and what
+- [x] Every file loads without error; corrupt or zero-length files listed
+- [x] Sample rate, bit depth, channel count per file — report any inconsistency
+- [x] Duration distribution overall and per emotion
+- [x] Leading/trailing silence measured; proportion of each clip that is silence
+- [x] Amplitude range; any clipping detected
+- [x] Per-actor clip counts (expect 60 each)
+- [x] Written `docs/data_audit.md` stating what is clean, what is not, and what
       preprocessing each finding implies
 
 **Gate:** the audit doc names at least three concrete preprocessing decisions
