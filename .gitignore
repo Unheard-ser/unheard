@@ -5,3 +5,6 @@ __pycache__/
 .venv/
 .ipynb_checkpoints/
 .DS_Store
+
+# Personal working notes — kept locally, not shared
+PROGRESS_TILL_NOW.md
