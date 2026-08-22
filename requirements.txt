@@ -1,0 +1,11 @@
+# Phase 0-5 dependencies. Pinned to the versions resolved on Python 3.14.4.
+# torch / transformers are deliberately absent -- they arrive in Phase 6.
+librosa==1.0.0
+soundfile==0.14.0
+numpy==2.5.2
+pandas==3.0.5
+scikit-learn==1.9.0
+matplotlib==3.11.1
+seaborn==0.13.2
+pyarrow==25.0.1
+pytest==9.1.1
