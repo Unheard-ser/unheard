@@ -13,7 +13,7 @@ It is the guided tour and takes about twenty minutes.
 ## 1. Clone and set up
 
 ```bash
-git clone https://github.com/unheard-ser/unheard.git
+git clone https://github.com/Unheard-ser/unheard.git
 cd unheard
 ```
 
