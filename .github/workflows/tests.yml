@@ -1,10 +1,15 @@
 name: tests
 
-# Runs on every push and on every pull request. The point is that a broken
-# fold contract or a changed metric is caught before anyone builds on it.
+# Runs on every push, so a broken fold contract or a changed metric is caught
+# before anyone builds on it.
+#
+# Push only, deliberately. A pull_request trigger would fire a second,
+# identical run on the same commit -- everyone here pushes branches to this
+# repo rather than working from forks, so the push run already covers every
+# commit that reaches a PR. Checks attach to the commit SHA, so they still
+# show up on the pull request.
 on:
   push:
-  pull_request:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
