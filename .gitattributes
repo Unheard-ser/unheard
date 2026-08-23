@@ -5,3 +5,7 @@ splits/folds.csv text eol=lf
 results/results.csv text eol=lf
 *.py text eol=lf
 *.md text eol=lf
+
+# CI runs on Linux; a CRLF sneaking into the workflow would break the
+# backslash line-continuations in its run: blocks.
+*.yml text eol=lf
