@@ -1,0 +1,47 @@
+name: tests
+
+# Runs on every push and on every pull request. The point is that a broken
+# fold contract or a changed metric is caught before anyone builds on it.
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      # Installing the pinned set is itself a check: if a pin stops
+      # resolving, feature values are no longer comparable across machines
+      # and we want to know here, not three commits later.
+      - name: Install pinned dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # The 1,440 clips are gitignored and will never exist on a runner.
+      # Every filename is in splits/folds.csv, so the tree that
+      # ser.metadata reads is rebuildable from the repo alone.
+      - name: Rebuild the filename-only audio tree
+        run: python .github/scripts/make_stub_audio.py
+
+      # test_preprocess and test_audit decode real waveforms; the stubs are
+      # empty files, so those two are excluded rather than faked. Everything
+      # else -- fold disjointness, the frozen-file guard, every metric and
+      # slice invariant -- runs for real.
+      - name: Run tests
+        run: |
+          python -m pytest -q \
+            --ignore=tests/test_preprocess.py \
+            --ignore=tests/test_audit.py
