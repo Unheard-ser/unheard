@@ -25,6 +25,15 @@ CLIP = DATA_ROOT / "Person01" / "01-01-01-01-01.wav"
 #: Speech-standard framing, for comparison against the inherited default.
 SPEECH_FRAMING = {"n_fft": 400, "hop_length": 160}  # 25 ms / 10 ms at 16 kHz
 
+#: CI has no audio: `.github/scripts/make_stub_audio.py` rebuilds the tree
+#: from splits/folds.csv as *empty* files so the filename- and fold-based
+#: tests can run for real. Anything that decodes a waveform must skip there.
+#: Most of this module is pure config logic and still runs on the runner.
+requires_audio = pytest.mark.skipif(
+    not (CLIP.is_file() and CLIP.stat().st_size > 0),
+    reason="needs the real clips; CI materialises empty stubs",
+)
+
 
 # --- 1. the framing is stated, in units humans use ------------------------
 
@@ -56,6 +65,7 @@ def test_describe_names_every_parameter():
 # --- 2. the hygiene change must not have moved any number -----------------
 
 
+@requires_audio
 def test_default_config_reproduces_the_committed_baseline_values():
     """Guards the claim that making defaults explicit changed nothing.
 
@@ -142,6 +152,7 @@ def test_delta_width_must_be_odd_and_at_least_three():
 # --- 6. finer framing really does give more frames ------------------------
 
 
+@requires_audio
 def test_speech_framing_yields_roughly_three_times_more_frames():
     import librosa
 
@@ -206,6 +217,7 @@ def test_unknown_aggregation_and_normalisation_raise():
     ("aggregation", "expected"),
     [("mean", 120), ("mean_std", 240), ("mean_std_min_max", 480), ("percentiles", 600)],
 )
+@requires_audio
 def test_aggregation_controls_feature_count(aggregation, expected):
     vector, columns = extract_one(CLIP, FeatureConfig(aggregation=aggregation))
     assert len(vector) == len(columns) == expected
