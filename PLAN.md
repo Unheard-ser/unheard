@@ -66,19 +66,23 @@ justified by evidence, not convention.
 Binding: EDA uses **training folds only**. Corpus-level counts (class balance)
 may use all 1,440 and must say so in the caption; anything that touches signal
 — pitch, energy, duration, projections — is restricted to training folds.
-- [ ] Class balance chart, with the neutral explanation annotated
-- [ ] Waveform + mel-spectrogram grid: one representative clip per emotion
-- [ ] Pitch (F0) distribution by emotion; energy/RMS distribution by emotion
-- [ ] Speaking rate / duration by emotion
-- [ ] Same analyses split by gender, and by intensity (normal vs strong)
-- [ ] 2-D projection (PCA and UMAP) of pooled features coloured by emotion,
+- [x] Class balance chart, with the neutral explanation annotated
+- [x] Waveform + mel-spectrogram grid: one representative clip per emotion
+- [x] Pitch (F0) distribution by emotion; energy/RMS distribution by emotion
+- [x] Speaking rate / duration by emotion
+- [x] Same analyses split by gender, and by intensity (normal vs strong)
+- [x] 2-D projection (PCA and UMAP) of pooled features coloured by emotion,
       then the same plot coloured by **actor** — if actor clusters are tighter
       than emotion clusters, that is the leakage story, visually
-- [ ] Every figure saved to `figures/` with a one-sentence interpretation in
+- [x] Every figure saved to `figures/` with a one-sentence interpretation in
       `docs/eda_findings.md`
 
-**Gate:** each figure has a written interpretation. A chart with no sentence
-attached earns nothing.
+**Gate:** PASSED 2026-08-25. 17 figures in `figures/`, each with an
+interpretation in `docs/eda_findings.md`. Signal analysis restricted to the
+1,140 training clips of fold 0 (19 actors); only the class-balance count uses
+all 1,440 and says so. **Headline: raw features cluster by ACTOR (silhouette
++0.0122) but not by EMOTION (-0.0359)** -- the leakage mechanism, visible in
+figures 13/14 and quantified in 17.
 
 ---
 
@@ -108,19 +112,24 @@ fold. **Folds are frozen — announce to the team.** See docs/splits.md.
 
 ## Phase 4 — Feature engineering as experiment  → *feeds Models & Approaches, 20 marks*
 Not plumbing. Each axis below is a variable to compare, not a default to assume.
-- [ ] `ser/features.py` parameterised over:
+- [x] `ser/features.py` parameterised over:
       - MFCC count (13 / 20 / 40), with and without delta / delta-delta
       - aggregation: mean · mean+std · mean+std+min+max · percentiles
       - extra descriptors: chroma, spectral contrast/centroid/rolloff, ZCR, F0 stats
       - normalisation: none · global z-score · **per-speaker z-score**
       - silence trimming on/off
-- [ ] Feature cache keyed by config hash; never recompute an existing config
-- [ ] Ablation grid run with ONE fixed model (SVM-RBF) across configs, so the
+      - framing: n_fft / hop_length / delta width (ADDED -- were invisible
+        librosa defaults until a teammate asked)
+- [x] Feature cache keyed by config hash; never recompute an existing config
+- [x] Ablation grid run with ONE fixed model (SVM-RBF) across configs, so the
       comparison isolates features
-- [ ] `docs/feature_findings.md`: which axes mattered, which did not
+- [x] `docs/feature_findings.md`: which axes mattered, which did not
 
-**Gate:** a table showing feature configs ranked, with per-speaker normalisation
-explicitly compared against global. This is a contribution, not a setting.
+**Gate:** PASSED 2026-08-23. `docs/feature_findings.md` ranks 19 configs plus 5
+combinations, with per-speaker (+6.53 pp macro-F1) compared explicitly against
+global. Winner `mfcc20-...-per_speaker`: 0.6389 acc / 0.6311 macro-F1, up
++13.31 pp on the floor with fewer features. **The 25 ms framing fix LOST**
+(-1.25 pp) -- a negative result, documented. Leakage gap narrowed 13.75 -> 8.82 pp.
 
 ---
 

@@ -17,9 +17,15 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
    Every experiment by every
    team member uses those exact fold assignments. This is the contract that makes
    five people's results comparable. If you believe a split is wrong, stop and ask.
-2. **Never fit anything on test data.** Scalers, PCA, feature selection, class
-   weights, and per-speaker statistics are fit on the training fold only and applied
-   to the held-out fold. No exceptions.
+2. **Never fit anything on test data.** Scalers, PCA, feature selection and class
+   weights are fit on the training fold only and applied to the held-out fold.
+   **One stated exception:** per-speaker normalisation (`per_speaker_normalise`)
+   computes a held-out speaker's statistics from their own clips, because under
+   `speaker_independent` that speaker has no training clips at all. It consumes
+   no labels — only audio, which is equally available at deployment — and is
+   standard CMVN practice. It is transductive; `docs/feature_findings.md` §3
+   states this openly. No other exception exists; add one only by amending
+   this rule, never silently.
 3. **Augmentation applies to training folds only.** Never to held-out data.
 4. **Speaker-independent is the primary protocol.** Random-stratified is run only
    as a deliberate comparison to quantify leakage. Never report the random-split
@@ -39,9 +45,14 @@ ser/
   metadata.py      parse the 5-field filename into a DataFrame (see Data facts)
   preprocess.py    load_audio() — THE single audio entry point: mono + 16 kHz
   audit.py         integrity checks on the raw audio
-  eda.py           plotting functions (return figures, never call plt.show)
+  eda.py           EDA measurement + plots (return figures, never plt.show);
+                   training_subset() is the guard -- signal analysis is
+                   TRAINING FOLDS ONLY
+  run_eda.py       Phase 2 driver -> figures/ + docs/eda_findings.md
   splits.py        4 protocols — FROZEN in splits/folds.csv, never regenerate
   features.py      feature extraction, parameterised (see below)
+  run_ablation.py  Phase 4 one-axis-at-a-time grid -> docs/feature_findings.md
+  run_baselines.py fit + score a config across protocols and models
   evaluate.py      the single scoring function everyone calls
   models/          one module per model family
 notebooks/         exploration and figures only — no logic lives here
