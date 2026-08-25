@@ -165,21 +165,27 @@ leaky protocol manufactures improvement that does not exist.
 ---
 
 ## Phase 7 — Novelty experiments  → *Storytelling + Metrics marks*
-- [ ] **Leakage diagnosis:** train a classifier to predict actor identity from
+- [x] **Leakage diagnosis:** train a classifier to predict actor identity from
       the features. If it succeeds, the features encode identity. Then test
       whether per-speaker normalisation narrows the accuracy gap.
-- [ ] **Lexical invariance:** train on statement 01, test on 02. Does prosody
+- [x] **Lexical invariance:** train on statement 01, test on 02. Does prosody
       generalise across content?
-- [ ] **Intensity conditioning:** accuracy on normal vs strong clips reported
+- [x] **Intensity conditioning:** accuracy on normal vs strong clips reported
       separately; optionally strong-first curriculum training.
-- [ ] **Gender fairness:** per-gender accuracy and macro-F1. Links directly to
+- [x] **Gender fairness:** per-gender accuracy and macro-F1. Links directly to
       the demographic-bias risk line in the business case slides.
-- [ ] **Arousal-first two-stage:** high/low arousal, then emotion within branch.
+- [x] **Arousal-first two-stage:** high/low arousal, then emotion within branch.
       Compare against flat 8-way.
-- [ ] Confusion-structure analysis: do errors cluster by arousal?
+- [x] Confusion-structure analysis: do errors cluster by arousal?
 
-**Gate:** each experiment has a stated hypothesis, a result, and an
-interpretation — including the ones that fail.
+**Gate:** PASSED 2026-08-25. Six experiments in docs/novelty_findings.md, each
+with hypothesis / result / interpretation. Three confirmed, one partly refuted,
+one refuted -- all reported in equal detail.
+**Headline: raw features identify the speaker with 92.7% accuracy, 22.3x
+chance.** Per-speaker normalisation cuts that to 21.2% but not to zero, which
+is why the leakage gap narrowed rather than closed. Arousal two-stage FAILED
+(-1.62 pp): the gate is only 85.1% accurate and its errors are unrecoverable.
+Gender gap 12.8 pp macro-F1, worse on male -- must be disclosed.
 
 ---
 
