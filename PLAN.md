@@ -190,9 +190,28 @@ Gender gap 12.8 pp macro-F1, worse on male -- must be disclosed.
 ---
 
 ## Phase 8 — Deliverables
-- [ ] All notebooks executed top to bottom, outputs saved, zero errors
-- [ ] Files named `Group-nn`; no .zip; code as .ipynb not PDF
-- [ ] Assignment Submission Form with all names + PGIDs
-- [ ] Deck follows the Session 1 structure (abstract → motivation → problem →
+- [x] All notebooks executed top to bottom, outputs saved, zero errors
+- [ ] Files named `Group-nn`; no .zip; code as .ipynb not PDF  <- needs group number
+- [ ] Assignment Submission Form with all names + PGIDs  <- YOURS: I have no names/PGIDs
+- [x] Deck follows the Session 1 structure (abstract → motivation → problem →
       data → EDA → approach → results → deployment → conclusion → references)
-- [ ] Code demo video recorded — 10 marks, owner assigned
+- [ ] Code demo video recorded — 10 marks, owner assigned  <- YOURS: I cannot record
+
+
+---
+
+## Status summary — 2026-08-25
+
+| Phase | State | Headline |
+|---|---|---|
+| 0 Foundation | done | 1,440 clips parsed, 5-field schema |
+| 1 Data audit | done | 50.6% silence; loudness carries emotion |
+| 3 Frozen harness | done | 4 protocols, folds frozen |
+| 2 EDA | done | actor silhouette +0.012 vs emotion -0.036 |
+| 4 Features | done | +13.31 pp; 25 ms framing LOST |
+| 5 Baselines | done | **SVM-RBF 0.6389 / 0.6333** -- the floor |
+| 6 Deep tracks | **teammate** | must beat 0.6333 macro-F1 |
+| 7 Novelty | done | **92.7% actor ID**; two-stage failed |
+| 8 Deliverables | partial | notebooks + deck done; video/form yours |
+
+Tests: 163 passing. Logged runs: 173.
