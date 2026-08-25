@@ -108,19 +108,24 @@ fold. **Folds are frozen — announce to the team.** See docs/splits.md.
 
 ## Phase 4 — Feature engineering as experiment  → *feeds Models & Approaches, 20 marks*
 Not plumbing. Each axis below is a variable to compare, not a default to assume.
-- [ ] `ser/features.py` parameterised over:
+- [x] `ser/features.py` parameterised over:
       - MFCC count (13 / 20 / 40), with and without delta / delta-delta
       - aggregation: mean · mean+std · mean+std+min+max · percentiles
       - extra descriptors: chroma, spectral contrast/centroid/rolloff, ZCR, F0 stats
       - normalisation: none · global z-score · **per-speaker z-score**
       - silence trimming on/off
-- [ ] Feature cache keyed by config hash; never recompute an existing config
-- [ ] Ablation grid run with ONE fixed model (SVM-RBF) across configs, so the
+      - framing: n_fft / hop_length / delta width (ADDED -- were invisible
+        librosa defaults until a teammate asked)
+- [x] Feature cache keyed by config hash; never recompute an existing config
+- [x] Ablation grid run with ONE fixed model (SVM-RBF) across configs, so the
       comparison isolates features
-- [ ] `docs/feature_findings.md`: which axes mattered, which did not
+- [x] `docs/feature_findings.md`: which axes mattered, which did not
 
-**Gate:** a table showing feature configs ranked, with per-speaker normalisation
-explicitly compared against global. This is a contribution, not a setting.
+**Gate:** PASSED 2026-08-23. `docs/feature_findings.md` ranks 19 configs plus 5
+combinations, with per-speaker (+6.53 pp macro-F1) compared explicitly against
+global. Winner `mfcc20-...-per_speaker`: 0.6389 acc / 0.6311 macro-F1, up
++13.31 pp on the floor with fewer features. **The 25 ms framing fix LOST**
+(-1.25 pp) -- a negative result, documented. Leakage gap narrowed 13.75 -> 8.82 pp.
 
 ---
 
