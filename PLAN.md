@@ -66,19 +66,23 @@ justified by evidence, not convention.
 Binding: EDA uses **training folds only**. Corpus-level counts (class balance)
 may use all 1,440 and must say so in the caption; anything that touches signal
 — pitch, energy, duration, projections — is restricted to training folds.
-- [ ] Class balance chart, with the neutral explanation annotated
-- [ ] Waveform + mel-spectrogram grid: one representative clip per emotion
-- [ ] Pitch (F0) distribution by emotion; energy/RMS distribution by emotion
-- [ ] Speaking rate / duration by emotion
-- [ ] Same analyses split by gender, and by intensity (normal vs strong)
-- [ ] 2-D projection (PCA and UMAP) of pooled features coloured by emotion,
+- [x] Class balance chart, with the neutral explanation annotated
+- [x] Waveform + mel-spectrogram grid: one representative clip per emotion
+- [x] Pitch (F0) distribution by emotion; energy/RMS distribution by emotion
+- [x] Speaking rate / duration by emotion
+- [x] Same analyses split by gender, and by intensity (normal vs strong)
+- [x] 2-D projection (PCA and UMAP) of pooled features coloured by emotion,
       then the same plot coloured by **actor** — if actor clusters are tighter
       than emotion clusters, that is the leakage story, visually
-- [ ] Every figure saved to `figures/` with a one-sentence interpretation in
+- [x] Every figure saved to `figures/` with a one-sentence interpretation in
       `docs/eda_findings.md`
 
-**Gate:** each figure has a written interpretation. A chart with no sentence
-attached earns nothing.
+**Gate:** PASSED 2026-08-25. 17 figures in `figures/`, each with an
+interpretation in `docs/eda_findings.md`. Signal analysis restricted to the
+1,140 training clips of fold 0 (19 actors); only the class-balance count uses
+all 1,440 and says so. **Headline: raw features cluster by ACTOR (silhouette
++0.0122) but not by EMOTION (-0.0359)** -- the leakage mechanism, visible in
+figures 13/14 and quantified in 17.
 
 ---
 

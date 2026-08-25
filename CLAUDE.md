@@ -45,7 +45,10 @@ ser/
   metadata.py      parse the 5-field filename into a DataFrame (see Data facts)
   preprocess.py    load_audio() — THE single audio entry point: mono + 16 kHz
   audit.py         integrity checks on the raw audio
-  eda.py           plotting functions (return figures, never call plt.show)
+  eda.py           EDA measurement + plots (return figures, never plt.show);
+                   training_subset() is the guard -- signal analysis is
+                   TRAINING FOLDS ONLY
+  run_eda.py       Phase 2 driver -> figures/ + docs/eda_findings.md
   splits.py        4 protocols — FROZEN in splits/folds.csv, never regenerate
   features.py      feature extraction, parameterised (see below)
   run_ablation.py  Phase 4 one-axis-at-a-time grid -> docs/feature_findings.md
