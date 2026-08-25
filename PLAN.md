@@ -134,17 +134,25 @@ global. Winner `mfcc20-...-per_speaker`: 0.6389 acc / 0.6311 macro-F1, up
 ---
 
 ## Phase 5 — Classical baselines
-- [ ] SVM-RBF, RandomForest, XGBoost, LogisticRegression, KNN, AdaBoost, GaussianNB
-- [ ] Each run under `speaker_independent` AND `random_stratified`
-- [ ] Comparison table; winner identified
-- [ ] Hyperparameter tuning on the winner only, via CV inside training folds
-- [ ] **The leakage gap reported as a headline number**
+- [x] SVM-RBF, RandomForest, XGBoost, LogisticRegression, KNN, AdaBoost, GaussianNB
+- [x] Each run under `speaker_independent` AND `random_stratified`
+- [x] Comparison table; winner identified
+- [x] Hyperparameter tuning on the winner only, via CV inside training folds
+- [x] **The leakage gap reported as a headline number**
 
-**Gate:** a baseline exists that every later model must beat to justify itself.
+**Gate:** PASSED 2026-08-25. **SVM-RBF, 0.6389 acc / 0.6333 macro-F1**, pooled
+speaker-independent, fold sd 0.0509 -- the floor. See docs/baseline_findings.md.
+Tuning gained only +0.22 pp macro-F1 (a fifth of the 5.09 pp fold sd): feature
+design moved the number +13.31 pp in Phase 4, estimator tuning moved it 0.22 pp.
+**Leakage gap 8.82 pp untuned, widening to 10.97 pp tuned** -- tuning against a
+leaky protocol manufactures improvement that does not exist.
 
 ---
 
 ## Phase 6 — Advanced tracks (parallel, one owner each)
+> **Owned by a teammate** (agreed 2026-08-25) — not implemented in this stream.
+> They must clear **0.6333 macro-F1** (the Phase 5 floor) to justify the
+> complexity, and log to `results/results.csv` under the same frozen folds.
 - [ ] 6a MLP on aggregated features
 - [ ] 6b CNN over mel-spectrograms
 - [ ] 6c CNN-LSTM / 1D-CNN over MFCC sequences (the RNN track)

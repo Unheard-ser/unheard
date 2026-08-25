@@ -9,6 +9,8 @@ matplotlib==3.11.1
 seaborn==0.13.2
 pyarrow==25.0.1
 pytest==9.1.1
+xgboost==3.4.1
+umap-learn==0.5.12
 
 # Notebook tooling -- needed to run and re-execute notebooks/
 jupyterlab==4.6.3
