@@ -28,7 +28,7 @@ from pathlib import Path
 
 import pandas as pd
 
-SEED = 42
+from ser import SEED  # single source; do not redeclare
 
 #: Root holding the per-actor directories. Note the doubled ``data`` segment.
 DATA_ROOT: Path = Path(__file__).resolve().parent.parent / "data" / "data"

@@ -19,7 +19,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC
 
-SEED = 42
+from ser import SEED  # single source; do not redeclare
 
 #: Model name -> factory. Every estimator uses library defaults apart from
 #: the fixed seed and n_jobs.
