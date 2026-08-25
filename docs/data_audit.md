@@ -236,6 +236,42 @@ lossless-downmix justification fails loudly rather than quietly becoming untrue.
 
 ---
 
+## 4b. Framing parameters — inherited, not chosen
+
+A teammate asked what frame duration the MFCCs use. We could not answer from
+the notebook, because we had never set it. These are librosa's defaults, which
+were in effect silently:
+
+| Parameter | Value in effect | Speech convention |
+|---|---|---|
+| Analysis window (`n_fft=2048`) | **128 ms** | 20–40 ms |
+| Hop (`hop_length=512`) | **32 ms** | ~10 ms |
+| Delta width (`width=9`) | 9 frames = **288 ms** | — |
+| Mel bands (`n_mels=128`) | 128 | 40–80 at 16 kHz |
+| Mel range (`fmin=0`, `fmax=sr/2`) | 0 – 8000 Hz | ~50 – 8000 Hz |
+| Trim resolution | 128 ms window, 32 ms steps | — |
+
+**Why this matters.** librosa is a *music* library. A long window buys fine
+frequency resolution, which is what you want to separate musical notes — and
+exactly the wrong trade for speech, where you want to catch fast transitions.
+At 128 ms an entire syllable fits inside one frame, so anything faster than
+that is averaged away.
+
+**The delta width is the subtle one.** It is measured in *frames*, so its
+meaning silently changes with the hop: 288 ms of context at a 32 ms hop, but
+only 90 ms at a 10 ms hop. Changing the framing without adjusting it would
+alter two things at once and make any ablation result unattributable.
+`FeatureConfig.resolved_delta_width` derives the width from the hop so the
+time context stays constant.
+
+**What we did.** All six are now explicit fields on `FeatureConfig`, *set to
+the values already in effect*, so this change moved no number — verified by a
+byte-identical checksum over all 1,440 × 240 feature values. Phase 4 sweeps
+them. The general rule this produced is now in CLAUDE.md: feature parameters
+must be explicit, never left to a library default.
+
+---
+
 ## 5. Secondary observations for Phase 2
 
 Not preprocessing decisions, but they shape what EDA should look for.

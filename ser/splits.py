@@ -50,9 +50,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import GroupKFold, StratifiedKFold
 
+from ser import SEED  # single source; do not redeclare
 from ser.metadata import load as load_metadata
-
-SEED = 42
 
 N_SPLITS = 5
 

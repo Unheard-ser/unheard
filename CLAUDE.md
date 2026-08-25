@@ -64,6 +64,12 @@ PLAN.md            phase checklist — update as phases complete
 - Feature extraction is **parameterised, not hardcoded**: aggregation strategy,
   normalisation strategy, and MFCC count are arguments with defaults, because
   comparing them is part of the experiment.
+- **Every parameter that affects the numbers must be explicit in `FeatureConfig`,
+  never left to a library default.** librosa's defaults are tuned for music and
+  several are wrong for speech — but the real problem with an unstated default is
+  that nobody can see it, question it, or sweep it. See `docs/data_audit.md` §4b.
+- `SEED` is defined once in `ser/__init__.py`. Import it; never redeclare it.
+  Call `ser.set_seeds()` at the top of any script with randomness.
 - pytest for anything with an invariant (counts, fold disjointness, no-leakage).
 
 ## Data facts (assert these, don't assume them)
