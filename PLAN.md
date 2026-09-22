@@ -327,13 +327,40 @@ Whether the merged corpus helps *that* model is untested.
 
 See `docs/wav2vec2_transfer_findings.md`.
 
-## Phase 14 — Pushing wav2vec2 further
-- [ ] Learnable layer-weighted sum (SUPERB) — exact from cached per-layer means
-- [ ] Speaker-adversarial training (gradient reversal) — attacks the 92.7%
-      finding head-on; before/after on emotion F1 *and* actor-ID accuracy
-- [ ] Prosody fusion: wav2vec2 ⊕ cached handcrafted F0/energy/RMS
-- [ ] Encoder comparison: WavLM-base-plus, HuBERT-base
-- [ ] Class-weighted heads for neutral (6.7%) and calm (1.6%)
+## Phase 14a — Six levers on the model  *(DONE)*
+Deliberately a pivot: four phases had gone to "does the external data help"
+(no), and these were the untried levers on the **model**.
+- [x] Regularisation sweep + inner-CV selection
+- [x] Dimensionality reduction (PCA 32/64/128/256, LDA-7)
+- [x] Multi-layer concatenation (L5-7, L4-8)
+- [x] Prosody fusion (wav2vec2 ⊕ handcrafted)
+- [x] Balanced class weights
+
+**Gate: PASSED as a negative result. The Phase 13 config is on a plateau.**
+No lever is significantly better than 0.7944; every positive delta's CI spans
+zero. Best is prosody fusion at 0.8030 (+0.86 pp, p = 0.204).
+
+Five variants are significantly *worse*, all of them compression: PCA-64
+−5.59 pp, PCA-32 −5.56 pp, **LDA-7 −24.71 pp**. With 768 dims and 1,140 clips
+PCA is the textbook move and it fails monotonically — the emotion signal is
+distributed across low-variance directions that PCA discards, because variance
+in these embeddings is dominated by speaker and channel. **Do not compress this
+representation.**
+
+Also: C=1 (the default) sits on the descending side of the regularisation
+curve, so the project *was* under-regularised — but only the over-permissive
+end (C=10, −3.00 pp) is significantly bad. See `docs/phase14_findings.md`.
+
+## Phase 14b — A different representation
+The plateau says headroom is not in the head, the regularisation, the layer
+choice or the dimensionality. It has to be the encoder or the data volume.
+- [ ] **WavLM-base-plus** — denoising + speaker simulation in pretraining;
+      leads wav2vec2 on SUPERB paralinguistics. Extraction running.
+- [ ] HuBERT-base
+- [ ] **Augmentation** (pitch-shift, time-stretch, AWGN), train folds only —
+      listed in PLAN since Phase 6 and never run by anyone
+- [ ] Speaker-adversarial training (gradient reversal) — attacks the 94.9%
+      actor-ID finding directly; before/after on emotion F1 *and* actor-ID
 - [ ] Colab fine-tuning notebook written, not run — documented as future work
 
 ## Phase 15 — Consolidation

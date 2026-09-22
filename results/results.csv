@@ -832,3 +832,99 @@ baa736ad,2026-09-22T21:11:52+00:00,sahitya1179,speaker_independent,pooled,wav2ve
 336746f8,2026-09-22T21:23:18+00:00,sahitya1179,speaker_independent,pooled,mfcc20-d-dd-mean_std-trim-chroma+spectral_centroid+spectral_contrast+zcr-per_speaker,linear-svc,"{""head"": ""LinearSVC"", ""max_iter"": 2000}",0.511111,0.509293,"phase-13b control: handcrafted + LinearSVC, train += TESS (pooled out-of-fold)"
 0b53b0b4,2026-09-22T21:23:19+00:00,sahitya1179,speaker_independent,pooled,mfcc20-d-dd-mean_std-trim-chroma+spectral_centroid+spectral_contrast+zcr-per_speaker,linear-svc,"{""head"": ""LinearSVC"", ""max_iter"": 2000}",0.572222,0.564096,"phase-13b control: handcrafted + LinearSVC, train += SAVEE (pooled out-of-fold)"
 8f60460e,2026-09-22T21:23:30+00:00,sahitya1179,speaker_independent,pooled,mfcc20-d-dd-mean_std-trim-chroma+spectral_centroid+spectral_contrast+zcr-per_speaker,linear-svc,"{""head"": ""LinearSVC"", ""max_iter"": 2000}",0.501389,0.492248,"phase-13b control: handcrafted + LinearSVC, train += CREMA-D+TESS+SAVEE (pooled out-of-fold)"
+e98a0aa2,2026-09-22T21:30:40+00:00,sahitya1179,speaker_independent,0,L6 logreg C=1 (baseline),logreg,"{""lever"": ""L6 logreg C=1 (baseline)""}",0.82,0.820173,phase-14a baseline
+e7e6de33,2026-09-22T21:30:48+00:00,sahitya1179,speaker_independent,1,L6 logreg C=1 (baseline),logreg,"{""lever"": ""L6 logreg C=1 (baseline)""}",0.793333,0.79379,phase-14a baseline
+cf0bf06a,2026-09-22T21:30:55+00:00,sahitya1179,speaker_independent,2,L6 logreg C=1 (baseline),logreg,"{""lever"": ""L6 logreg C=1 (baseline)""}",0.79,0.78447,phase-14a baseline
+4696763c,2026-09-22T21:31:03+00:00,sahitya1179,speaker_independent,3,L6 logreg C=1 (baseline),logreg,"{""lever"": ""L6 logreg C=1 (baseline)""}",0.82,0.810519,phase-14a baseline
+cba04947,2026-09-22T21:31:12+00:00,sahitya1179,speaker_independent,4,L6 logreg C=1 (baseline),logreg,"{""lever"": ""L6 logreg C=1 (baseline)""}",0.766667,0.755376,phase-14a baseline
+22199791,2026-09-22T21:31:12+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=1 (baseline),logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=1 (baseline)""}",0.799306,0.794382,phase-14a baseline (pooled out-of-fold)
+3fbd74bf,2026-09-22T21:31:18+00:00,sahitya1179,speaker_independent,0,L6 logreg C=0.001,logreg,"{""lever"": ""L6 logreg C=0.001""}",0.79,0.786397,phase-14a regularisation sweep C=0.001
+a6a221d2,2026-09-22T21:31:24+00:00,sahitya1179,speaker_independent,1,L6 logreg C=0.001,logreg,"{""lever"": ""L6 logreg C=0.001""}",0.77,0.772103,phase-14a regularisation sweep C=0.001
+d095b942,2026-09-22T21:31:32+00:00,sahitya1179,speaker_independent,2,L6 logreg C=0.001,logreg,"{""lever"": ""L6 logreg C=0.001""}",0.773333,0.7561,phase-14a regularisation sweep C=0.001
+f4768206,2026-09-22T21:31:38+00:00,sahitya1179,speaker_independent,3,L6 logreg C=0.001,logreg,"{""lever"": ""L6 logreg C=0.001""}",0.803333,0.793256,phase-14a regularisation sweep C=0.001
+b8f143f6,2026-09-22T21:31:48+00:00,sahitya1179,speaker_independent,4,L6 logreg C=0.001,logreg,"{""lever"": ""L6 logreg C=0.001""}",0.7625,0.767083,phase-14a regularisation sweep C=0.001
+3c832ae1,2026-09-22T21:31:48+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=0.001,logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=0.001""}",0.780556,0.775852,phase-14a regularisation sweep C=0.001 (pooled out-of-fold)
+d4e5d135,2026-09-22T21:31:59+00:00,sahitya1179,speaker_independent,0,L6 logreg C=0.01,logreg,"{""lever"": ""L6 logreg C=0.01""}",0.84,0.842297,phase-14a regularisation sweep C=0.01
+5d19c79e,2026-09-22T21:32:07+00:00,sahitya1179,speaker_independent,1,L6 logreg C=0.01,logreg,"{""lever"": ""L6 logreg C=0.01""}",0.793333,0.795245,phase-14a regularisation sweep C=0.01
+b86e1249,2026-09-22T21:32:19+00:00,sahitya1179,speaker_independent,2,L6 logreg C=0.01,logreg,"{""lever"": ""L6 logreg C=0.01""}",0.806667,0.793759,phase-14a regularisation sweep C=0.01
+0c59044d,2026-09-22T21:32:28+00:00,sahitya1179,speaker_independent,3,L6 logreg C=0.01,logreg,"{""lever"": ""L6 logreg C=0.01""}",0.816667,0.807979,phase-14a regularisation sweep C=0.01
+6668310b,2026-09-22T21:32:40+00:00,sahitya1179,speaker_independent,4,L6 logreg C=0.01,logreg,"{""lever"": ""L6 logreg C=0.01""}",0.775,0.765651,phase-14a regularisation sweep C=0.01
+29dc1b66,2026-09-22T21:32:40+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=0.01,logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=0.01""}",0.807639,0.802825,phase-14a regularisation sweep C=0.01 (pooled out-of-fold)
+349c08fe,2026-09-22T21:32:53+00:00,sahitya1179,speaker_independent,0,L6 logreg C=0.1,logreg,"{""lever"": ""L6 logreg C=0.1""}",0.84,0.841265,phase-14a regularisation sweep C=0.1
+93f71571,2026-09-22T21:33:05+00:00,sahitya1179,speaker_independent,1,L6 logreg C=0.1,logreg,"{""lever"": ""L6 logreg C=0.1""}",0.793333,0.794943,phase-14a regularisation sweep C=0.1
+9fb09da2,2026-09-22T21:33:12+00:00,sahitya1179,speaker_independent,2,L6 logreg C=0.1,logreg,"{""lever"": ""L6 logreg C=0.1""}",0.803333,0.79797,phase-14a regularisation sweep C=0.1
+86b6c271,2026-09-22T21:33:19+00:00,sahitya1179,speaker_independent,3,L6 logreg C=0.1,logreg,"{""lever"": ""L6 logreg C=0.1""}",0.823333,0.815073,phase-14a regularisation sweep C=0.1
+5f0f0271,2026-09-22T21:33:27+00:00,sahitya1179,speaker_independent,4,L6 logreg C=0.1,logreg,"{""lever"": ""L6 logreg C=0.1""}",0.7625,0.752979,phase-14a regularisation sweep C=0.1
+e9056901,2026-09-22T21:33:27+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=0.1,logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=0.1""}",0.80625,0.802379,phase-14a regularisation sweep C=0.1 (pooled out-of-fold)
+49c360b0,2026-09-22T21:33:31+00:00,sahitya1179,speaker_independent,0,L6 logreg C=1,logreg,"{""lever"": ""L6 logreg C=1""}",0.82,0.820173,phase-14a regularisation sweep C=1
+7db62ab7,2026-09-22T21:33:35+00:00,sahitya1179,speaker_independent,1,L6 logreg C=1,logreg,"{""lever"": ""L6 logreg C=1""}",0.793333,0.79379,phase-14a regularisation sweep C=1
+89d480a7,2026-09-22T21:33:40+00:00,sahitya1179,speaker_independent,2,L6 logreg C=1,logreg,"{""lever"": ""L6 logreg C=1""}",0.79,0.78447,phase-14a regularisation sweep C=1
+f769ca5c,2026-09-22T21:33:44+00:00,sahitya1179,speaker_independent,3,L6 logreg C=1,logreg,"{""lever"": ""L6 logreg C=1""}",0.82,0.810519,phase-14a regularisation sweep C=1
+0a32917a,2026-09-22T21:33:48+00:00,sahitya1179,speaker_independent,4,L6 logreg C=1,logreg,"{""lever"": ""L6 logreg C=1""}",0.766667,0.755376,phase-14a regularisation sweep C=1
+fbdd2f9a,2026-09-22T21:33:48+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=1,logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=1""}",0.799306,0.794382,phase-14a regularisation sweep C=1 (pooled out-of-fold)
+b5472c6b,2026-09-22T21:33:50+00:00,sahitya1179,speaker_independent,0,L6 logreg C=10,logreg,"{""lever"": ""L6 logreg C=10""}",0.79,0.786299,phase-14a regularisation sweep C=10
+cba17fee,2026-09-22T21:33:51+00:00,sahitya1179,speaker_independent,1,L6 logreg C=10,logreg,"{""lever"": ""L6 logreg C=10""}",0.763333,0.760357,phase-14a regularisation sweep C=10
+505916ca,2026-09-22T21:33:52+00:00,sahitya1179,speaker_independent,2,L6 logreg C=10,logreg,"{""lever"": ""L6 logreg C=10""}",0.75,0.736975,phase-14a regularisation sweep C=10
+f718826d,2026-09-22T21:33:54+00:00,sahitya1179,speaker_independent,3,L6 logreg C=10,logreg,"{""lever"": ""L6 logreg C=10""}",0.806667,0.799848,phase-14a regularisation sweep C=10
+cd6dc259,2026-09-22T21:33:55+00:00,sahitya1179,speaker_independent,4,L6 logreg C=10,logreg,"{""lever"": ""L6 logreg C=10""}",0.7375,0.732625,phase-14a regularisation sweep C=10
+4035b0db,2026-09-22T21:33:55+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C=10,logreg,"{""chosen"": null, ""lever"": ""L6 logreg C=10""}",0.770833,0.76436,phase-14a regularisation sweep C=10 (pooled out-of-fold)
+24c2498a,2026-09-22T21:34:41+00:00,sahitya1179,speaker_independent,0,L6 logreg C by inner CV,logreg,"{""lever"": ""L6 logreg C by inner CV""}",0.84,0.842297,"phase-14a regularisation, C selected by inner CV"
+4ad16e84,2026-09-22T21:35:31+00:00,sahitya1179,speaker_independent,1,L6 logreg C by inner CV,logreg,"{""lever"": ""L6 logreg C by inner CV""}",0.793333,0.795245,"phase-14a regularisation, C selected by inner CV"
+6ce952e4,2026-09-22T21:36:22+00:00,sahitya1179,speaker_independent,2,L6 logreg C by inner CV,logreg,"{""lever"": ""L6 logreg C by inner CV""}",0.806667,0.793759,"phase-14a regularisation, C selected by inner CV"
+4ee2650a,2026-09-22T21:37:10+00:00,sahitya1179,speaker_independent,3,L6 logreg C by inner CV,logreg,"{""lever"": ""L6 logreg C by inner CV""}",0.816667,0.807979,"phase-14a regularisation, C selected by inner CV"
+02079c58,2026-09-22T21:42:32+00:00,sahitya1179,speaker_independent,4,L6 logreg C by inner CV,logreg,"{""lever"": ""L6 logreg C by inner CV""}",0.7625,0.752979,"phase-14a regularisation, C selected by inner CV"
+adc0b69e,2026-09-22T21:42:32+00:00,sahitya1179,speaker_independent,pooled,L6 logreg C by inner CV,logreg,"{""chosen"": [""C=0.01"", ""C=0.01"", ""C=0.01"", ""C=0.01"", ""C=0.1""], ""lever"": ""L6 logreg C by inner CV""}",0.805556,0.800662,"phase-14a regularisation, C selected by inner CV (pooled out-of-fold)"
+b78f45e8,2026-09-22T21:42:32+00:00,sahitya1179,speaker_independent,0,L6 PCA32 + logreg,logreg,"{""lever"": ""L6 PCA32 + logreg""}",0.73,0.72962,phase-14a PCA 32
+aeea783f,2026-09-22T21:42:33+00:00,sahitya1179,speaker_independent,1,L6 PCA32 + logreg,logreg,"{""lever"": ""L6 PCA32 + logreg""}",0.703333,0.702136,phase-14a PCA 32
+a72144bc,2026-09-22T21:42:33+00:00,sahitya1179,speaker_independent,2,L6 PCA32 + logreg,logreg,"{""lever"": ""L6 PCA32 + logreg""}",0.763333,0.752009,phase-14a PCA 32
+d536d7a9,2026-09-22T21:42:33+00:00,sahitya1179,speaker_independent,3,L6 PCA32 + logreg,logreg,"{""lever"": ""L6 PCA32 + logreg""}",0.806667,0.800457,phase-14a PCA 32
+1c648d9d,2026-09-22T21:42:34+00:00,sahitya1179,speaker_independent,4,L6 PCA32 + logreg,logreg,"{""lever"": ""L6 PCA32 + logreg""}",0.7,0.700561,phase-14a PCA 32
+1ecd36d2,2026-09-22T21:42:34+00:00,sahitya1179,speaker_independent,pooled,L6 PCA32 + logreg,logreg,"{""chosen"": null, ""lever"": ""L6 PCA32 + logreg""}",0.742361,0.738804,phase-14a PCA 32 (pooled out-of-fold)
+c0c1cdee,2026-09-22T21:42:35+00:00,sahitya1179,speaker_independent,0,L6 PCA64 + logreg,logreg,"{""lever"": ""L6 PCA64 + logreg""}",0.74,0.741226,phase-14a PCA 64
+4afca623,2026-09-22T21:42:35+00:00,sahitya1179,speaker_independent,1,L6 PCA64 + logreg,logreg,"{""lever"": ""L6 PCA64 + logreg""}",0.736667,0.734605,phase-14a PCA 64
+9b281a08,2026-09-22T21:42:36+00:00,sahitya1179,speaker_independent,2,L6 PCA64 + logreg,logreg,"{""lever"": ""L6 PCA64 + logreg""}",0.763333,0.758448,phase-14a PCA 64
+942572ad,2026-09-22T21:42:36+00:00,sahitya1179,speaker_independent,3,L6 PCA64 + logreg,logreg,"{""lever"": ""L6 PCA64 + logreg""}",0.756667,0.750401,phase-14a PCA 64
+ccc9c71f,2026-09-22T21:42:37+00:00,sahitya1179,speaker_independent,4,L6 PCA64 + logreg,logreg,"{""lever"": ""L6 PCA64 + logreg""}",0.708333,0.703842,phase-14a PCA 64
+4825de1d,2026-09-22T21:42:37+00:00,sahitya1179,speaker_independent,pooled,L6 PCA64 + logreg,logreg,"{""chosen"": null, ""lever"": ""L6 PCA64 + logreg""}",0.742361,0.738446,phase-14a PCA 64 (pooled out-of-fold)
+ab9c31b1,2026-09-22T21:42:38+00:00,sahitya1179,speaker_independent,0,L6 PCA128 + logreg,logreg,"{""lever"": ""L6 PCA128 + logreg""}",0.806667,0.801111,phase-14a PCA 128
+edce841a,2026-09-22T21:42:38+00:00,sahitya1179,speaker_independent,1,L6 PCA128 + logreg,logreg,"{""lever"": ""L6 PCA128 + logreg""}",0.733333,0.731517,phase-14a PCA 128
+ed3202e3,2026-09-22T21:42:39+00:00,sahitya1179,speaker_independent,2,L6 PCA128 + logreg,logreg,"{""lever"": ""L6 PCA128 + logreg""}",0.793333,0.781929,phase-14a PCA 128
+5e05d735,2026-09-22T21:42:39+00:00,sahitya1179,speaker_independent,3,L6 PCA128 + logreg,logreg,"{""lever"": ""L6 PCA128 + logreg""}",0.773333,0.766103,phase-14a PCA 128
+47aa2a29,2026-09-22T21:42:40+00:00,sahitya1179,speaker_independent,4,L6 PCA128 + logreg,logreg,"{""lever"": ""L6 PCA128 + logreg""}",0.729167,0.727107,phase-14a PCA 128
+2bfdf5cc,2026-09-22T21:42:40+00:00,sahitya1179,speaker_independent,pooled,L6 PCA128 + logreg,logreg,"{""chosen"": null, ""lever"": ""L6 PCA128 + logreg""}",0.76875,0.762573,phase-14a PCA 128 (pooled out-of-fold)
+d9160216,2026-09-22T21:42:43+00:00,sahitya1179,speaker_independent,0,L6 PCA256 + logreg,logreg,"{""lever"": ""L6 PCA256 + logreg""}",0.816667,0.816074,phase-14a PCA 256
+4d7e19dd,2026-09-22T21:42:46+00:00,sahitya1179,speaker_independent,1,L6 PCA256 + logreg,logreg,"{""lever"": ""L6 PCA256 + logreg""}",0.756667,0.75797,phase-14a PCA 256
+78daea8a,2026-09-22T21:42:50+00:00,sahitya1179,speaker_independent,2,L6 PCA256 + logreg,logreg,"{""lever"": ""L6 PCA256 + logreg""}",0.79,0.780082,phase-14a PCA 256
+4afe098b,2026-09-22T21:42:53+00:00,sahitya1179,speaker_independent,3,L6 PCA256 + logreg,logreg,"{""lever"": ""L6 PCA256 + logreg""}",0.826667,0.821816,phase-14a PCA 256
+6460e3b1,2026-09-22T21:42:56+00:00,sahitya1179,speaker_independent,4,L6 PCA256 + logreg,logreg,"{""lever"": ""L6 PCA256 + logreg""}",0.758333,0.751251,phase-14a PCA 256
+94d9b580,2026-09-22T21:42:56+00:00,sahitya1179,speaker_independent,pooled,L6 PCA256 + logreg,logreg,"{""chosen"": null, ""lever"": ""L6 PCA256 + logreg""}",0.790972,0.786918,phase-14a PCA 256 (pooled out-of-fold)
+1fa98f74,2026-09-22T21:43:00+00:00,sahitya1179,speaker_independent,0,L6 LDA + logreg,logreg,"{""lever"": ""L6 LDA + logreg""}",0.51,0.491814,phase-14a LDA 7
+26fb9bda,2026-09-22T21:43:03+00:00,sahitya1179,speaker_independent,1,L6 LDA + logreg,logreg,"{""lever"": ""L6 LDA + logreg""}",0.546667,0.545048,phase-14a LDA 7
+b06e28fc,2026-09-22T21:43:07+00:00,sahitya1179,speaker_independent,2,L6 LDA + logreg,logreg,"{""lever"": ""L6 LDA + logreg""}",0.58,0.577238,phase-14a LDA 7
+922cf44d,2026-09-22T21:43:11+00:00,sahitya1179,speaker_independent,3,L6 LDA + logreg,logreg,"{""lever"": ""L6 LDA + logreg""}",0.593333,0.582714,phase-14a LDA 7
+ecb9913b,2026-09-22T21:43:14+00:00,sahitya1179,speaker_independent,4,L6 LDA + logreg,logreg,"{""lever"": ""L6 LDA + logreg""}",0.5375,0.521892,phase-14a LDA 7
+1ec22710,2026-09-22T21:43:14+00:00,sahitya1179,speaker_independent,pooled,L6 LDA + logreg,logreg,"{""chosen"": null, ""lever"": ""L6 LDA + logreg""}",0.554167,0.547255,phase-14a LDA 7 (pooled out-of-fold)
+2ce83a73,2026-09-22T21:43:20+00:00,sahitya1179,speaker_independent,0,L5+L6+L7 concat + logreg,logreg,"{""lever"": ""L5+L6+L7 concat + logreg""}",0.803333,0.795842,phase-14a multi-layer concat L5+L6+L7
+6dfeaead,2026-09-22T21:43:24+00:00,sahitya1179,speaker_independent,1,L5+L6+L7 concat + logreg,logreg,"{""lever"": ""L5+L6+L7 concat + logreg""}",0.776667,0.775031,phase-14a multi-layer concat L5+L6+L7
+8da7b99e,2026-09-22T21:43:29+00:00,sahitya1179,speaker_independent,2,L5+L6+L7 concat + logreg,logreg,"{""lever"": ""L5+L6+L7 concat + logreg""}",0.81,0.797897,phase-14a multi-layer concat L5+L6+L7
+efd974fa,2026-09-22T21:43:34+00:00,sahitya1179,speaker_independent,3,L5+L6+L7 concat + logreg,logreg,"{""lever"": ""L5+L6+L7 concat + logreg""}",0.82,0.809003,phase-14a multi-layer concat L5+L6+L7
+53943809,2026-09-22T21:43:38+00:00,sahitya1179,speaker_independent,4,L5+L6+L7 concat + logreg,logreg,"{""lever"": ""L5+L6+L7 concat + logreg""}",0.795833,0.780934,phase-14a multi-layer concat L5+L6+L7
+b0d55acf,2026-09-22T21:43:38+00:00,sahitya1179,speaker_independent,pooled,L5+L6+L7 concat + logreg,logreg,"{""chosen"": null, ""lever"": ""L5+L6+L7 concat + logreg""}",0.801389,0.792569,phase-14a multi-layer concat L5+L6+L7 (pooled out-of-fold)
+3b870a49,2026-09-22T21:43:43+00:00,sahitya1179,speaker_independent,0,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.826667,0.820684,phase-14a multi-layer concat L4+L5+L6+L7+L8
+98880ff5,2026-09-22T21:43:46+00:00,sahitya1179,speaker_independent,1,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.81,0.80658,phase-14a multi-layer concat L4+L5+L6+L7+L8
+d1b2aa70,2026-09-22T21:43:49+00:00,sahitya1179,speaker_independent,2,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.81,0.800151,phase-14a multi-layer concat L4+L5+L6+L7+L8
+81bb4f55,2026-09-22T21:43:52+00:00,sahitya1179,speaker_independent,3,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.813333,0.799004,phase-14a multi-layer concat L4+L5+L6+L7+L8
+b7640aaa,2026-09-22T21:43:55+00:00,sahitya1179,speaker_independent,4,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.783333,0.769608,phase-14a multi-layer concat L4+L5+L6+L7+L8
+352b0e0a,2026-09-22T21:43:55+00:00,sahitya1179,speaker_independent,pooled,L4+L5+L6+L7+L8 concat + logreg,logreg,"{""chosen"": null, ""lever"": ""L4+L5+L6+L7+L8 concat + logreg""}",0.809722,0.801031,phase-14a multi-layer concat L4+L5+L6+L7+L8 (pooled out-of-fold)
+3382bd44,2026-09-22T21:44:03+00:00,sahitya1179,speaker_independent,0,L6 + handcrafted prosody,logreg,"{""lever"": ""L6 + handcrafted prosody""}",0.823333,0.817362,phase-14a prosody fusion
+6eeaabdb,2026-09-22T21:44:09+00:00,sahitya1179,speaker_independent,1,L6 + handcrafted prosody,logreg,"{""lever"": ""L6 + handcrafted prosody""}",0.8,0.805023,phase-14a prosody fusion
+2adeac4a,2026-09-22T21:44:15+00:00,sahitya1179,speaker_independent,2,L6 + handcrafted prosody,logreg,"{""lever"": ""L6 + handcrafted prosody""}",0.796667,0.785718,phase-14a prosody fusion
+4316dcc5,2026-09-22T21:44:20+00:00,sahitya1179,speaker_independent,3,L6 + handcrafted prosody,logreg,"{""lever"": ""L6 + handcrafted prosody""}",0.826667,0.825066,phase-14a prosody fusion
+96fe9ccd,2026-09-22T21:44:28+00:00,sahitya1179,speaker_independent,4,L6 + handcrafted prosody,logreg,"{""lever"": ""L6 + handcrafted prosody""}",0.779167,0.776409,phase-14a prosody fusion
+033f3255,2026-09-22T21:44:28+00:00,sahitya1179,speaker_independent,pooled,L6 + handcrafted prosody,logreg,"{""chosen"": null, ""lever"": ""L6 + handcrafted prosody""}",0.80625,0.802969,phase-14a prosody fusion (pooled out-of-fold)
+fa94b679,2026-09-22T21:44:36+00:00,sahitya1179,speaker_independent,0,L6 logreg balanced,logreg,"{""lever"": ""L6 logreg balanced""}",0.82,0.817469,phase-14a balanced class weights
+5a16847a,2026-09-22T21:44:43+00:00,sahitya1179,speaker_independent,1,L6 logreg balanced,logreg,"{""lever"": ""L6 logreg balanced""}",0.796667,0.801166,phase-14a balanced class weights
+e577390a,2026-09-22T21:44:51+00:00,sahitya1179,speaker_independent,2,L6 logreg balanced,logreg,"{""lever"": ""L6 logreg balanced""}",0.78,0.773051,phase-14a balanced class weights
+7dbdf47a,2026-09-22T21:44:58+00:00,sahitya1179,speaker_independent,3,L6 logreg balanced,logreg,"{""lever"": ""L6 logreg balanced""}",0.816667,0.806072,phase-14a balanced class weights
+4b891e46,2026-09-22T21:45:07+00:00,sahitya1179,speaker_independent,4,L6 logreg balanced,logreg,"{""lever"": ""L6 logreg balanced""}",0.775,0.767008,phase-14a balanced class weights
+42006c49,2026-09-22T21:45:08+00:00,sahitya1179,speaker_independent,pooled,L6 logreg balanced,logreg,"{""chosen"": null, ""lever"": ""L6 logreg balanced""}",0.798611,0.793393,phase-14a balanced class weights (pooled out-of-fold)
