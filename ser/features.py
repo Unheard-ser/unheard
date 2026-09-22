@@ -371,6 +371,8 @@ def extract(
     config: FeatureConfig | None = None,
     df: pd.DataFrame | None = None,
     use_cache: bool = True,
+    cache_path: Path | None = None,
+    n_jobs: int = 1,
 ) -> pd.DataFrame:
     """Extract features for every clip, caching by config hash.
 
@@ -378,6 +380,16 @@ def extract(
         config: Feature configuration. Defaults to `FeatureConfig()`.
         df: Metadata frame. Defaults to the full inventory.
         use_cache: Read from and write to the parquet cache.
+        cache_path: Override the cache file. Required when extracting over a
+            clip set other than the RAVDESS inventory -- the merged corpus
+            shares a `FeatureConfig`, and therefore a hash, with RAVDESS, so
+            without a distinct path the two would evict each other on every
+            call. The filename check below would prevent a *wrong* read, but
+            the thrashing would silently cost hours.
+        n_jobs: Worker processes for extraction. ``1`` keeps the original
+            serial path exactly. Extraction is CPU-bound and per-clip
+            independent, so this scales close to linearly -- which matters
+            once the clip count goes from 1,440 to 12,162.
 
     Returns:
         Metadata columns plus one column per feature, in metadata row order.
@@ -386,27 +398,34 @@ def extract(
     if df is None:
         df = load_metadata()
 
-    if use_cache and config.cache_path.is_file():
-        cached = pd.read_parquet(config.cache_path)
+    target = cache_path if cache_path is not None else config.cache_path
+
+    if use_cache and target.is_file():
+        cached = pd.read_parquet(target)
         if len(cached) == len(df) and (
             cached["filename"].to_numpy() == df["filename"].to_numpy()
         ).all():
             return cached
 
-    vectors: list[np.ndarray] = []
-    columns: list[str] | None = None
-    for path in df["filepath"]:
-        vector, names = extract_one(path, config)
-        if columns is None:
-            columns = names
-        vectors.append(vector)
+    paths = df["filepath"].tolist()
+    if n_jobs == 1:
+        results = [extract_one(path, config) for path in paths]
+    else:
+        from joblib import Parallel, delayed
+
+        results = Parallel(n_jobs=n_jobs, backend="loky")(
+            delayed(extract_one)(path, config) for path in paths
+        )
+
+    vectors = [vector for vector, _ in results]
+    columns = results[0][1] if results else []
 
     features = pd.DataFrame(np.vstack(vectors), columns=columns)
     out = pd.concat([df.reset_index(drop=True), features], axis=1)
 
     if use_cache:
-        CACHE_DIR.mkdir(parents=True, exist_ok=True)
-        out.to_parquet(config.cache_path, index=False)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        out.to_parquet(target, index=False)
     return out
 
 

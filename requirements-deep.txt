@@ -1,0 +1,19 @@
+# Phase 13-14: frozen self-supervised speech embeddings.
+#
+# Install on top of requirements.txt:
+#
+#     pip install -r requirements.txt
+#     pip install -r requirements-deep.txt --extra-index-url https://download.pytorch.org/whl/cpu
+#
+# CPU builds, deliberately. There is no CUDA on the machines this runs on,
+# which is precisely why the design is frozen embeddings plus a light head
+# rather than fine-tuning -- see docs/merged_corpus_design.md. A GPU box can
+# install the default CUDA wheels instead; nothing in `ser/` assumes CPU.
+#
+# Kept out of requirements.txt because these are ~2 GB and CI needs none of
+# them: `ser.embeddings` imports torch inside its functions, so its 34 tests
+# run without torch installed.
+
+torch==2.13.0+cpu
+torchaudio==2.11.0+cpu
+transformers==5.15.1

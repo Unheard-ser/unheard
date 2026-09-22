@@ -197,6 +197,129 @@ Gender gap 12.8 pp macro-F1, worse on male -- must be disclosed.
       data → EDA → approach → results → deployment → conclusion → references)
 - [ ] Code demo video recorded — 10 marks, owner assigned  <- YOURS: I cannot record
 
+---
+
+# Final-review arc — added 2026-09-22
+
+A teammate delivered a merged corpus (RAVDESS + CREMA-D + TESS + SAVEE, 12,162
+clips, 121 speakers) and the wav2vec2 track (Phase 6d) is the last modelling
+work open. Both land here. The governing decisions are in
+`docs/merged_corpus_design.md`, written **before** any result existed, and in
+CLAUDE.md rule 9.
+
+**Two architectures, both built, headline decided by pre-registered criterion:**
+- **A** — external corpora in *training only*; test side is the frozen RAVDESS
+  fold. 8-class problem intact, comparable to the 0.6333 floor, `calm` shortcut
+  unavailable by construction.
+- **B** — new frozen folds over all 12,162 clips (`splits/folds_merged.csv`).
+
+## Phase 9 — Corpus integration and audit
+- [x] `ser/corpora.py` — the teammate's builder as an importable module;
+      RAVDESS delegated to `ser.metadata`, not re-parsed
+- [x] `data_external/` gitignored; CLAUDE.md rules 1/4/7 amended, rule 9 added
+- [x] CREMA-D / TESS / SAVEE fetched
+- [ ] `ser/run_corpus_audit.py` → `docs/dataset_merge.md`
+- [x] `tests/test_corpora.py` (29 tests)
+
+**Gate:** counts match published sizes, no cross-corpus duplicates, both
+confounds named in the doc.
+
+## Phase 9.5 — Early read
+- [ ] `ser/run_early_read.py`: one model (SVM-RBF, defaults) across four cells
+      — C1 phase-5 reproduction (drift check), C2 RAVDESS-only on the merged
+      matrix (the honest control), C3 Architecture A, C4 Architecture B — plus
+      the corpus-identity probe
+
+**Gate:** C1 reproduces 0.6389/0.6333. Without that nothing else means anything.
+
+## Phase 10 — EDA on the merged corpus
+- [ ] Training folds only, as Phase 2. Class balance by corpus, clips per
+      speaker, duration, spectral rolloff, RMS loudness, F0 per emotion faceted
+      by corpus
+- [ ] **2-D projection coloured by CORPUS vs by EMOTION with silhouettes** —
+      the direct analogue of Phase 2's actor-vs-emotion figure
+- [ ] `docs/merged_eda_findings.md`
+
+## Phase 11 — Splits
+- [x] `ser/splits_merged.py` — Architecture A helper + three Architecture B
+      protocols, own write-once freeze guard
+- [x] `tests/test_splits_merged.py` (17 tests) — including a test that hashes
+      `splits/folds.csv` either side of every merged operation
+- [ ] Freeze `splits/folds_merged.csv`
+
+## Phase 12 — The seven classical models, re-run
+- [x] Corpus-selection sweep: all 8 subsets. **Every one hurts**, monotonically
+      with volume (Pearson r = −0.98). Best remains RAVDESS alone.
+- [x] `docs/merged_baseline_findings.md`
+- [ ] 2 × 2 × 7 grid: {handcrafted, wav2vec2} × {Arch A, Arch B} × seven models
+- [ ] `random_stratified` counterparts so every cell has a leakage gap
+
+## Phase 12b — Applying the external corpora correctly
+Four covariate-shift remedies, `ser/run_transfer.py`. **None beats the control;
+the ceiling is a tie.**
+- [x] Uniform down-weighting (sweep + weight chosen by inner CV)
+- [x] Importance weighting (density ratio), −5.01 pp
+- [x] Class-selective via inner CV — **worst result, −17.26 pp**; selecting
+      classes for individual benefit wrecks the priors
+- [x] Scaler-only — exactly ties the control
+- [x] **Inner CV chose weight = 0.0 in all five folds**, with no access to test.
+      The data itself says discard the external corpora.
+
+## Phase 12c — Uncertainty  *(new; applies to every phase)*
+- [x] `ser/stats.py` — cluster bootstrap (resamples **speakers**, not clips),
+      paired bootstrap on differences, exact McNemar
+- [x] `tests/test_stats.py` (16 tests), incl. clip-level intervals proven >3×
+      too narrow on clustered data
+- [x] `ser/run_significance.py` → the headline 0.6311 carries a **±4.5 pp**
+      95% interval
+- [ ] Reword Phase 5's +0.22 pp tuning gain and Phase 4's −1.25 pp framing loss:
+      both are inside the noise and are currently written as results
+
+## Phase 13 — wav2vec2, frozen embeddings  *(CLOSES Phase 6d)*
+- [x] `ser/embeddings.py` — one pass caches **all 13 layers**, so the layer
+      sweep costs no extra forward passes. 60 min, 295 ms/clip, 971 MB.
+- [x] `tests/test_embeddings.py` (34 tests)
+- [x] Layer → pooling → normalisation → head sweep
+- [x] Full 13-layer curve + figure 18
+- [x] Actor-ID probe re-run on learned features + figure 19
+
+**Gate: PASSED. 0.7993 acc / 0.7944 macro-F1** [0.7479, 0.8355], pooled
+speaker-independent — **+16.33 pp** over the 0.6311 floor, clearing the 0.6333
+bar set for a deep track. `wav2vec2-base`, **layer 6**, mean pooling,
+per-speaker normalisation, **linear** head. See `docs/wav2vec2_findings.md`.
+
+Three headlines:
+- **Emotion lives mid-network.** Layer 6 beats the final layer by 17.6 pp;
+  layers 11-12 fall *below* the handcrafted floor. Taking `last_hidden_state`,
+  which every quickstart shows, would have cost 17.6 points.
+- **Per-speaker normalisation is worth +16.01 pp here**, against +6.53 pp on
+  MFCCs — the largest single effect in the sweep.
+- **The best emotion features are the best speaker features.** wav2vec2
+  identifies the actor at **94.9%** (22.8x chance) vs MFCCs' 92.7%, and retains
+  *more* residual identity after per-speaker normalisation (34.9% vs 21.2%).
+  Better representations do not dissolve the leakage problem.
+
+Not claimed: logistic-regression's +0.88 pp over svm-rbf is inside the noise
+(p = 0.442) and is written up as indistinguishable.
+
+## Phase 13b — does the merged corpus help once features are learned?
+- [ ] The hypothesis Phase 12 left open: wav2vec2 is pretrained on ~960 h of
+      out-of-domain speech, so the volume effect that dominated there may not
+      apply. Corpus-subset sweep + down-weighting, same frozen test folds.
+
+## Phase 14 — Pushing wav2vec2 further
+- [ ] Learnable layer-weighted sum (SUPERB) — exact from cached per-layer means
+- [ ] Speaker-adversarial training (gradient reversal) — attacks the 92.7%
+      finding head-on; before/after on emotion F1 *and* actor-ID accuracy
+- [ ] Prosody fusion: wav2vec2 ⊕ cached handcrafted F0/energy/RMS
+- [ ] Encoder comparison: WavLM-base-plus, HuBERT-base
+- [ ] Class-weighted heads for neutral (6.7%) and calm (1.6%)
+- [ ] Colab fine-tuning notebook written, not run — documented as future work
+
+## Phase 15 — Consolidation
+- [ ] `notebooks/03_merged_corpus.ipynb`, `notebooks/04_wav2vec2.ipynb`
+- [ ] README, DECK, and the final comparison table with the pre-registered
+      criterion applied in the open
 
 ---
 

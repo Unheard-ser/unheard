@@ -20,23 +20,41 @@ measured is worth more than a high number that is not reproducible.
 
 ## Where things stand
 
-Classical baselines on MFCC-40 + Δ + ΔΔ, mean/std aggregated, defaults only,
-no tuning — pooled out-of-fold:
+Pooled out-of-fold on the frozen `speaker_independent` folds — the primary
+protocol, and the only one reported on its own:
 
-| protocol | model | accuracy | macro-F1 |
-| --- | --- | --- | --- |
-| **speaker_independent** | svm-rbf | **0.515** | **0.498** |
-| speaker_independent | random-forest | 0.467 | 0.423 |
-| random_stratified | svm-rbf | 0.652 | 0.636 |
-| random_stratified | random-forest | 0.585 | 0.554 |
+| approach | accuracy | macro-F1 |
+| --- | --- | --- |
+| **wav2vec2 L6 + per-speaker norm + linear head** | **0.799** | **0.794** |
+| handcrafted MFCC-20 + extras, svm-rbf (the floor) | 0.639 | 0.631 |
+| handcrafted, + all 3 external corpora pooled in | 0.524 | 0.520 |
+| first MFCC-40 baseline | 0.515 | 0.498 |
 
-The gap between the two protocols is the point, not a nuisance. Random
-stratified splits let the same 24 voices appear on both sides, and it buys
-~14 accuracy points that would not survive contact with an unseen speaker.
-**Speaker-independent is the primary protocol.** The random-split number is
-never reported on its own.
+Three results the project rests on:
+
+**Frozen pretrained embeddings beat hand-designed features by 16.3 pp**, using a
+*linear* head and no feature engineering — more than the entire Phase 4 feature
+programme bought (+13.3 pp). Emotion lives in the **middle** of wav2vec2: layer
+6 beats the final layer by 17.6 pp, and layers 11–12 fall below the handcrafted
+floor entirely. See `docs/wav2vec2_findings.md`.
+
+**Merging three more corpora makes it worse, and that is measured, not
+assumed.** Every subset of CREMA-D / TESS / SAVEE hurts, monotonically with
+volume (r = −0.98), and four covariate-shift remedies fail to beat RAVDESS
+alone. Inner cross-validation, given the choice, discards the external data in
+all five folds. See `docs/merged_baseline_findings.md`.
+
+**The features that recognise emotion best also identify the speaker best.**
+wav2vec2 recovers which of 24 actors is talking with 94.9% accuracy — above
+MFCCs' 92.7%, 22.8× chance — and per-speaker normalisation leaves *more*
+residual identity than it does on MFCCs. The leakage problem does not go away
+with better representations.
+
+Every number carries a cluster-bootstrap interval that resamples **speakers,
+not clips** (`ser/stats.py`); the headline 0.794 is [0.748, 0.836].
 
 Full log: `results/results.csv`. Split definitions: `docs/splits.md`.
+Environment gotchas (Windows Smart App Control, OneDrive): `docs/environment.md`.
 
 ---
 
@@ -44,6 +62,11 @@ Full log: `results/results.csv`. Split definitions: `docs/splits.md`.
 
 `notebooks/00_project_walkthrough.ipynb` — the guided tour. Twenty minutes,
 end to end: the data, the splits, the features, the baseline, the scoring.
+
+`notebooks/02_full_pipeline.ipynb` — **the graded submission
+notebook.** Self-contained: every function it uses is defined inside it, so it
+imports nothing from `ser/` and reproduces every result in the report starting
+from the raw audio. Read this one if you want the whole project in one file.
 
 Setting up your machine, getting the audio, the branch workflow and the
 frozen-fold contract are all in **[CONTRIBUTING.md](CONTRIBUTING.md)**. Read
@@ -130,14 +153,22 @@ ser/
   preprocess.py    load_audio() -- THE single audio entry point: mono, 16 kHz
   audit.py         integrity checks on the raw audio
   splits.py        4 protocols, FROZEN in splits/folds.csv
+  splits_merged.py the two multi-corpus architectures; own frozen file
+  corpora.py       RAVDESS + CREMA-D + TESS + SAVEE as one index
   features.py      parameterised feature extraction
+  embeddings.py    frozen wav2vec2 / WavLM / HuBERT; caches all 13 layers
   evaluate.py      the single scoring function everyone calls
+  stats.py         cluster bootstrap + McNemar -- uncertainty on every claim
   models/          one module per model family
   run_baselines.py the classical floor
-notebooks/         exploration and figures only -- no logic lives here
+notebooks/         exploration and figures only -- no logic lives here,
+                   EXCEPT 02_full_pipeline.ipynb, which inlines
+                   everything deliberately: it is the standalone deliverable
 splits/folds.csv   committed, frozen 2026-08-22, never regenerated
 results/results.csv appended by evaluate.py
-docs/              data_audit.md, splits.md
+docs/              data_audit.md, splits.md, wav2vec2_findings.md,
+                   merged_baseline_findings.md, dataset_merge.md,
+                   merged_corpus_design.md, environment.md
 figures/           saved plots for the deck
 ```
 
@@ -154,6 +185,8 @@ pytest
 
 CI runs on every push and every pull request. It has no audio, so it rebuilds
 a filename-only stand-in from `splits/folds.csv` and runs everything except
-the two files that decode real waveforms — 70 tests, including every
-fold-disjointness, no-leakage and metric invariant. The full suite needs the
-clips present; run it locally before opening a PR.
+the two files that decode real waveforms — including every fold-disjointness,
+no-leakage and metric invariant, the guard that `splits/folds.csv` is
+byte-identical after any merged-corpus work, and the cluster-bootstrap
+invariants. 259 tests at last count. The full suite needs the clips present;
+run it locally before opening a PR.

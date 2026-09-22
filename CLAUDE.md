@@ -17,6 +17,11 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
    Every experiment by every
    team member uses those exact fold assignments. This is the contract that makes
    five people's results comparable. If you believe a split is wrong, stop and ask.
+   **Amended 2026-09-22 (external corpora).** `folds.csv` remains frozen and
+   byte-identical; `tests/test_splits_merged.py` hashes it either side of every
+   merged-corpus operation. The merged corpus gets its own write-once file,
+   `splits/folds_merged.csv`, under the same guard. Adding a second fold file
+   does not relax the first.
 2. **Never fit anything on test data.** Scalers, PCA, feature selection and class
    weights are fit on the training fold only and applied to the held-out fold.
    **One stated exception:** per-speaker normalisation (`per_speaker_normalise`)
@@ -29,14 +34,36 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
 3. **Augmentation applies to training folds only.** Never to held-out data.
 4. **Speaker-independent is the primary protocol.** Random-stratified is run only
    as a deliberate comparison to quantify leakage. Never report the random-split
-   number alone.
+   number alone. **Amended 2026-09-22:** on the merged corpus the cross-corpus
+   protocol is `corpus_holdout` (leave-one-corpus-out). It is the only protocol
+   where recording conditions differ between train and test, so it is the honest
+   generalisation number and must be reported alongside
+   `speaker_independent_merged`, never replaced by it.
 5. **Every run appends a row to `results/results.csv`.** No result exists unless
    it is logged there.
 6. **Fix all random seeds.** `SEED = 42`, set for numpy, sklearn, torch, and the
    Python hash seed.
 7. **Never commit audio files.** `data/` is gitignored. Never commit
-   `features/*.parquet` either — they are regenerable.
+   `features/*.parquet` either — they are regenerable. **Amended 2026-09-22:**
+   `data_external/` (CREMA-D, TESS, SAVEE and the built `dataset_index.csv`)
+   and the `features/w2v_*.npy` embedding caches are gitignored on the same
+   grounds. The embedding caches run to ~1 GB.
 8. If execution diverges from the approved plan, stop and re-enter plan mode.
+9. **External corpora enter training, never the headline test set.** Added
+   2026-09-22, when a teammate's merge of CREMA-D + TESS + SAVEE arrived.
+   Two architectures exist and both are reported:
+   - **A (headline candidate).** Test side is the frozen RAVDESS
+     `speaker_independent` fold, unchanged; external clips are added to the
+     *training* side only (`ser.splits_merged.augmented_train`). The 8-class
+     problem stays intact, results stay comparable to the 0.6333 floor, and the
+     `calm` shortcut is neutralised by construction — every test clip is
+     RAVDESS, so corpus identity is constant on the test set and carries zero
+     information. A test asserts the test side contains no external clip.
+   - **B.** New folds over all 12,162 clips (`splits/folds_merged.csv`).
+   **B's numbers are never printed beside A's without stating that the
+   denominators differ.** Which becomes the headline is decided by the
+   criterion pre-registered in `docs/merged_corpus_design.md`, written before
+   any result existed — not chosen afterwards.
 
 ## Repo layout
 
