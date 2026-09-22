@@ -29,13 +29,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from ser import set_seeds
+from ser import SEED, set_seeds
 from ser import corpora
 from ser.embeddings import EmbeddingConfig
 from ser.evaluate import evaluate_pooled
 from ser.features import CACHE_DIR
-from ser.models.classical import default_hyperparams
-from ser.run_wav2vec2 import build_matrix, head, load_cached
+from ser.run_wav2vec2 import build_matrix, load_cached
 from ser.splits import get_split, load_folds
 from ser.stats import cluster_bootstrap_ci, mcnemar, paired_cluster_bootstrap
 
@@ -44,10 +43,34 @@ EXTERNAL: tuple[str, ...] = ("CREMA-D", "TESS", "SAVEE")
 #: The Phase 13 winner. Fixed across every row so the comparison isolates the
 #: training data rather than the feature configuration.
 WINNER = EmbeddingConfig(layer=6, pooling="mean", normalisation="per_speaker")
-MODEL = "logistic-regression"
 
 #: External-clip weights, matching Phase 12b so the two are comparable.
 WEIGHT_GRID: tuple[float, ...] = (1.0, 0.1, 0.01)
+
+
+def linear_head():
+    """A linear head that scales to 12,000 training clips.
+
+    Phase 13's winner used `LogisticRegression(max_iter=2000)`, which is fine on
+    1,140 RAVDESS clips but not here: lbfgs on 8,882 x 768 with 8 classes takes
+    roughly 35 minutes for a single fit, and this phase needs 50 of them.
+    `LinearSVC` fits the same clip set in 41 seconds -- measured, not assumed --
+    and is the same kind of model: a linear decision boundary on frozen
+    embeddings.
+
+    The swap costs nothing in validity because **every cell in this phase uses
+    it, including the RAVDESS-only control**. The comparison is internal: each
+    row differs from the control only by which training clips were added. It
+    does mean this phase's control will not be numerically identical to Phase
+    13's 0.7944, and that number is reported here rather than assumed.
+
+    Phase 13 also established that the linear and RBF heads are statistically
+    indistinguishable on these features (p = 0.442), so nothing rests on which
+    linear solver is used.
+    """
+    from sklearn.svm import LinearSVC
+
+    return LinearSVC(max_iter=2000, random_state=SEED)
 
 
 def subsets() -> list[tuple[str, ...]]:
@@ -89,7 +112,7 @@ def run(results_path: Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
                 np.where(is_external.loc[train].to_numpy(), weight, 1.0)
                 if extra else None
             )
-            estimator = head(MODEL, standardise=False)
+            estimator = linear_head()
             estimator.fit(
                 features.loc[train].to_numpy(),
                 labels.loc[train].to_numpy(),
@@ -108,8 +131,8 @@ def run(results_path: Path | None = None) -> tuple[pd.DataFrame, pd.DataFrame]:
 
         pooled = evaluate_pooled(
             per_fold, "speaker_independent",
-            model=MODEL, feature_config=WINNER.name,
-            hyperparams=default_hyperparams(MODEL),
+            model="linear-svc", feature_config=WINNER.name,
+            hyperparams={"max_iter": 2000, "head": "LinearSVC"},
             notes=notes + " (pooled out-of-fold)", results_path=results_path,
         )
         kept[label] = pd.concat(collected, ignore_index=True)

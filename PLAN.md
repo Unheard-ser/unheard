@@ -303,9 +303,29 @@ Not claimed: logistic-regression's +0.88 pp over svm-rbf is inside the noise
 (p = 0.442) and is written up as indistinguishable.
 
 ## Phase 13b — does the merged corpus help once features are learned?
-- [ ] The hypothesis Phase 12 left open: wav2vec2 is pretrained on ~960 h of
-      out-of-domain speech, so the volume effect that dominated there may not
-      apply. Corpus-subset sweep + down-weighting, same frozen test folds.
+- [x] Corpus-subset sweep + down-weighting on wav2vec2 embeddings
+- [x] **Head control** (`ser/run_head_control.py`) — handcrafted features
+      through the Phase 13b head, so features are the only variable
+
+**Gate: PASSED, with a claim withdrawn.** Still nothing helps — but **7 of 10
+variants are now statistically indistinguishable from using no external data**,
+against Phase 12 where every subset hurt badly.
+
+The mid-run reading was "better representations absorb domain shift better"
+(damage shrinking fourfold). **The control overturned it.** Swapping SVM-RBF for
+LinearSVC on the *same handcrafted features* cuts the all-three penalty from
+−11.11 pp to −4.82 pp — over half the effect attributed to wav2vec2. Held
+like-for-like, wav2vec2 is better on two cells and worse on two.
+
+What survives, and is now stronger for surviving a head swap that moved every
+individual number: **no subset of the external corpora significantly improves
+RAVDESS performance under any feature/head combination tested.**
+
+Still open: Phase 13's actual winner (logistic regression, 0.7944) could not be
+run across this sweep inside the compute budget — 35 min per fit at 8,882×768.
+Whether the merged corpus helps *that* model is untested.
+
+See `docs/wav2vec2_transfer_findings.md`.
 
 ## Phase 14 — Pushing wav2vec2 further
 - [ ] Learnable layer-weighted sum (SUPERB) — exact from cached per-layer means

@@ -38,11 +38,15 @@ programme bought (+13.3 pp). Emotion lives in the **middle** of wav2vec2: layer
 6 beats the final layer by 17.6 pp, and layers 11–12 fall below the handcrafted
 floor entirely. See `docs/wav2vec2_findings.md`.
 
-**Merging three more corpora makes it worse, and that is measured, not
-assumed.** Every subset of CREMA-D / TESS / SAVEE hurts, monotonically with
-volume (r = −0.98), and four covariate-shift remedies fail to beat RAVDESS
-alone. Inner cross-validation, given the choice, discards the external data in
-all five folds. See `docs/merged_baseline_findings.md`.
+**Merging three more corpora does not help, and that is measured, not assumed.**
+No subset of CREMA-D / TESS / SAVEE significantly improves on RAVDESS alone
+under any feature/head combination tried — 8 subsets on handcrafted features,
+10 variants on wav2vec2 embeddings, plus four covariate-shift remedies. Inner
+cross-validation, given the choice and no sight of the test fold, discards the
+external data in all five folds. *How much* it hurts turns out to depend more on
+the classifier than on the features: the same handcrafted features lose 11.1 pp
+under an RBF kernel and 4.8 pp under a linear one. See
+`docs/merged_baseline_findings.md` and `docs/wav2vec2_transfer_findings.md`.
 
 **The features that recognise emotion best also identify the speaker best.**
 wav2vec2 recovers which of 24 actors is talking with 94.9% accuracy — above
