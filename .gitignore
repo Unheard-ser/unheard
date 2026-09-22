@@ -13,3 +13,4 @@ PROGRESS_TILL_NOW.md
 # Audio is never committed (rule 7); the index is regenerable from it.
 data_external/
 data_standardized/
+data_augmented/
