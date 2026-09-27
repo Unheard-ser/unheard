@@ -1,0 +1,610 @@
+<title>Unheard Project Briefing</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#f7f8f8; --card:#ffffff; --sunk:#eef1f2;
+    --ink:#161d22; --body:#2d3a42; --muted:#5f6d76; --rule:#dbe1e5;
+    --s1:#0076a3; --s2:#c2610f;
+    --s1-soft:#e2eff5; --s2-soft:#f7ebe0;
+    --good:#2c6e49; --bad:#9d332e; --warn:#8a5d00;
+    --grid:#e6eaed;
+    --serif:"IBM Plex Serif",Georgia,serif;
+    --sans:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+    --paper:#12171a; --card:#1a2126; --sunk:#222b31;
+    --ink:#eef2f4; --body:#c7d2d8; --muted:#93a1a9; --rule:#2b353c;
+    --s1:#2f9fb5; --s2:#c9803a;
+    --s1-soft:#16303a; --s2-soft:#33261a;
+    --good:#74c98f; --bad:#e88c85; --warn:#e0b357;
+    --grid:#26313800;--grid:#263138;
+  }}
+  :root[data-theme="dark"]{
+    --paper:#12171a; --card:#1a2126; --sunk:#222b31;
+    --ink:#eef2f4; --body:#c7d2d8; --muted:#93a1a9; --rule:#2b353c;
+    --s1:#2f9fb5; --s2:#c9803a;
+    --s1-soft:#16303a; --s2-soft:#33261a;
+    --good:#74c98f; --bad:#e88c85; --warn:#e0b357;
+    --grid:#263138;
+  }
+
+  body{background:var(--paper);color:var(--body);font-family:var(--serif);
+       font-size:15.5px;line-height:1.6;margin:0;}
+  .wrap{max-width:50rem;margin:0 auto;padding-inline:20px;padding-block:36px 64px;}
+
+  h1,h2,h3,h4{font-family:var(--sans);color:var(--ink);text-wrap:balance;margin:0;}
+  h1{font-size:1.9rem;font-weight:600;line-height:1.18;letter-spacing:-.02em;}
+  h2{font-size:1.2rem;font-weight:600;}
+  h3{font-size:1rem;font-weight:600;margin-top:1.5rem;}
+  h4{font-size:.9rem;font-weight:600;}
+  p{margin:.8rem 0;}
+  .lede{font-size:1.02rem;color:var(--muted);margin-top:.6rem;}
+  section{margin-top:2.6rem;}
+  .eyebrow{font-family:var(--sans);font-size:.7rem;font-weight:600;letter-spacing:.11em;
+           text-transform:uppercase;color:var(--s1);margin-bottom:.3rem;}
+  code{font-family:var(--mono);font-size:.86em;background:var(--sunk);
+       padding:1px 5px;border-radius:3px;}
+
+  .note{background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--s1);
+        border-radius:0 5px 5px 0;padding:11px 14px;margin:1rem 0;font-size:.93rem;}
+  .note b{font-family:var(--sans);color:var(--ink);}
+  .note.warnbox{border-left-color:var(--s2);}
+
+  .scroll{overflow-x:auto;}
+  table{border-collapse:collapse;width:100%;font-size:.88rem;margin:.9rem 0;}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);vertical-align:top;}
+  th{font-family:var(--sans);font-size:.72rem;font-weight:600;color:var(--muted);
+     text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}
+  td.n{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;}
+
+  figure{margin:1.4rem 0 0;}
+  figcaption{font-family:var(--sans);font-size:.8rem;color:var(--muted);margin-top:.5rem;}
+  .figtitle{font-family:var(--sans);font-size:.95rem;font-weight:600;color:var(--ink);
+            margin-bottom:.15rem;}
+
+  /* horizontal bar chart */
+  .bars{display:grid;grid-template-columns:auto 1fr auto;gap:5px 10px;align-items:center;
+        font-family:var(--sans);font-size:.83rem;margin-top:.7rem;}
+  .bars .lbl{color:var(--body);white-space:nowrap;}
+  .bars .track{background:var(--sunk);border-radius:3px;height:16px;position:relative;}
+  .bars .fill{height:100%;border-radius:3px;background:var(--s1);}
+  .bars .fill.alt{background:var(--s2);}
+  .bars .fill.neg{background:var(--s2);margin-left:auto;}
+  .bars .val{font-family:var(--mono);font-variant-numeric:tabular-nums;
+             color:var(--ink);font-size:.82rem;}
+  .bars .lbl.dim{color:var(--muted);}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--sans);
+          font-size:.8rem;color:var(--muted);margin-top:.6rem;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .swatch{width:11px;height:11px;border-radius:2px;display:inline-block;}
+
+  /* confusion matrix */
+  .cm{border-collapse:separate;border-spacing:2px;font-size:.74rem;
+      font-family:var(--mono);font-variant-numeric:tabular-nums;}
+  .cm th{font-family:var(--sans);font-size:.68rem;padding:3px 5px;border:0;
+         text-transform:none;letter-spacing:0;}
+  .cm th.rowh{text-align:right;color:var(--body);}
+  .cm td{padding:0;border:0;width:34px;height:26px;text-align:center;
+         border-radius:3px;color:var(--ink);}
+
+  ul.plain{padding-left:1.1rem;margin:.7rem 0;}
+  ul.plain li{margin:.45rem 0;}
+  ul.plain li b{font-family:var(--sans);color:var(--ink);}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media (max-width:560px){ .split{grid-template-columns:1fr;} h1{font-size:1.55rem;} }
+
+  footer{margin-top:3rem;padding-top:1.1rem;border-top:1px solid var(--rule);
+         font-family:var(--sans);font-size:.79rem;color:var(--muted);}
+</style>
+
+<div class="wrap">
+
+<div class="eyebrow">Team briefing · 23 Sep 2026</div>
+<h1>Speech emotion recognition: where we are</h1>
+<p class="lede">What wav2vec2 is, what data we have, how we test honestly,
+what we found, and what's left. Written for someone who hasn't seen the code.</p>
+
+<!-- ============ 1. WAV2VEC2 ============ -->
+<section>
+<div class="eyebrow">Start here</div>
+<h2>What wav2vec2 actually is</h2>
+
+<p>It's a model Meta released in 2020, trained on <b>960 hours of speech</b> —
+audiobooks, no labels attached. It learned by playing a fill-in-the-blank game:
+hide a slice of audio, predict what was missing. Do that a few million times and
+the model ends up with an internal representation of what human speech
+<em>is</em> — where the pitch sits, how energy moves, what a voice does.</p>
+
+<p>Crucially, <b>nobody told it about emotion</b>. It has never seen an "angry"
+label. It just knows speech deeply, and emotion turns out to be part of what it
+encoded along the way.</p>
+
+<div class="note">
+<b>How we use it.</b> We <em>freeze</em> it — we don't retrain it at all. We feed
+each clip in, read the numbers out of its middle, and train a small, ordinary
+classifier on those numbers. Two reasons: retraining needs a graphics card we
+don't have, and freezing already beats everything else we tried.
+</div>
+
+<h3>The part that matters: it has 12 internal layers</h3>
+<p>Audio goes in one end and passes through 12 processing stages. Each stage
+turns every 20 milliseconds of sound into <b>768 numbers</b>. You have to choose
+which stage to read from — and every tutorial tells you to take the last one.</p>
+<p><b>That's wrong for emotion, and it's our most useful finding.</b> The chart
+below is why.</p>
+</section>
+
+<!-- ============ 2. THE LAYER CHART ============ -->
+<section>
+<figure>
+<div class="figtitle">Emotion lives in the middle of the network</div>
+<div class="scroll">
+<svg viewBox="0 0 640 300" width="100%" style="max-width:100%;height:auto"
+     role="img" aria-label="Macro-F1 by wav2vec2 layer. Both curves peak at layer 6 and collapse at layers 11 and 12.">
+  <!-- grid -->
+  <g stroke="var(--grid)" stroke-width="1">
+    <line x1="56" y1="219.5" x2="616" y2="219.5"/>
+    <line x1="56" y1="158.4" x2="616" y2="158.4"/>
+    <line x1="56" y1="97.3"  x2="616" y2="97.3"/>
+    <line x1="56" y1="36.2"  x2="616" y2="36.2"/>
+  </g>
+  <!-- y labels -->
+  <g font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--muted)" text-anchor="end">
+    <text x="48" y="223">0.50</text><text x="48" y="162">0.60</text>
+    <text x="48" y="101">0.70</text><text x="48" y="40">0.80</text>
+  </g>
+  <!-- floor reference -->
+  <line x1="56" y1="139.4" x2="616" y2="139.4" stroke="var(--muted)"
+        stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="616" y="134" font-family="IBM Plex Sans, sans-serif" font-size="10"
+        fill="var(--muted)" text-anchor="end">our old hand-built features · 0.631</text>
+
+  <!-- global series -->
+  <polyline fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round"
+    points="56,219.8 102.7,180.1 149.3,152.5 196,132.9 242.7,123.6 289.3,120 336,112.1 382.7,112.5 429.3,124.2 476,135.1 522.7,155.1 569.3,215.9 616,216.5"/>
+  <!-- per-speaker series -->
+  <polyline fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"
+    points="56,147.8 102.7,113.7 149.3,96.3 196,66.6 242.7,68.8 289.3,54.4 336,45 382.7,52.1 429.3,60.5 476,69.6 522.7,87.7 569.3,145.4 616,161.9"/>
+
+  <!-- markers -->
+  <g fill="var(--s2)">
+    <circle cx="56" cy="219.8" r="3"/><circle cx="102.7" cy="180.1" r="3"/>
+    <circle cx="149.3" cy="152.5" r="3"/><circle cx="196" cy="132.9" r="3"/>
+    <circle cx="242.7" cy="123.6" r="3"/><circle cx="289.3" cy="120" r="3"/>
+    <circle cx="336" cy="112.1" r="3"/><circle cx="382.7" cy="112.5" r="3"/>
+    <circle cx="429.3" cy="124.2" r="3"/><circle cx="476" cy="135.1" r="3"/>
+    <circle cx="522.7" cy="155.1" r="3"/><circle cx="569.3" cy="215.9" r="3"/>
+    <circle cx="616" cy="216.5" r="3"/>
+  </g>
+  <g fill="var(--s1)">
+    <circle cx="56" cy="147.8" r="3"/><circle cx="102.7" cy="113.7" r="3"/>
+    <circle cx="149.3" cy="96.3" r="3"/><circle cx="196" cy="66.6" r="3"/>
+    <circle cx="242.7" cy="68.8" r="3"/><circle cx="289.3" cy="54.4" r="3"/>
+    <circle cx="336" cy="45" r="5" stroke="var(--card)" stroke-width="2"/>
+    <circle cx="382.7" cy="52.1" r="3"/><circle cx="429.3" cy="60.5" r="3"/>
+    <circle cx="476" cy="69.6" r="3"/><circle cx="522.7" cy="87.7" r="3"/>
+    <circle cx="569.3" cy="145.4" r="3"/><circle cx="616" cy="161.9" r="3"/>
+  </g>
+
+  <!-- peak callout -->
+  <text x="336" y="32" font-family="IBM Plex Sans, sans-serif" font-size="11"
+        font-weight="600" fill="var(--s1)" text-anchor="middle">layer 6 · 0.786</text>
+  <!-- direct labels -->
+  <text x="330" y="106" font-family="IBM Plex Sans, sans-serif" font-size="10.5"
+        fill="var(--s2)" text-anchor="middle">plain scaling</text>
+  <text x="200" y="59" font-family="IBM Plex Sans, sans-serif" font-size="10.5"
+        fill="var(--s1)" text-anchor="middle">per-speaker scaling</text>
+
+  <!-- x axis -->
+  <line x1="56" y1="258" x2="616" y2="258" stroke="var(--rule)" stroke-width="1"/>
+  <g font-family="IBM Plex Mono, monospace" font-size="10" fill="var(--muted)" text-anchor="middle">
+    <text x="56" y="272">0</text><text x="149.3" y="272">2</text>
+    <text x="242.7" y="272">4</text><text x="336" y="272">6</text>
+    <text x="429.3" y="272">8</text><text x="522.7" y="272">10</text>
+    <text x="616" y="272">12</text>
+  </g>
+  <text x="336" y="292" font-family="IBM Plex Sans, sans-serif" font-size="10.5"
+        fill="var(--muted)" text-anchor="middle">which of the 12 internal layers we read from</text>
+</svg>
+</div>
+<figcaption>Layer 6 scores <b>0.786</b>; layer 12 — the one everybody uses —
+scores <b>0.594</b>. That's 19 points thrown away by following the default.
+Layers 11 and 12 are <em>worse than our old hand-built features</em>.</figcaption>
+</figure>
+
+<p><b>Why this happens.</b> wav2vec2's training game rewards predicting
+<em>what word</em> comes next. So its later layers specialise in words and drop
+everything else. Emotion isn't in the words — it's in the delivery — and that
+survives in the middle layers.</p>
+</section>
+
+<!-- ============ 3. THE DATA ============ -->
+<section>
+<div class="eyebrow">The data</div>
+<h2>Four datasets, by name</h2>
+
+<div class="scroll">
+<table>
+<thead><tr><th>Name</th><th>What it is</th><th class="n">Clips</th><th class="n">Speakers</th><th class="n">Emotions</th></tr></thead>
+<tbody>
+<tr><td><b>RAVDESS</b></td><td>Ours. Canadian actors, studio-recorded, 2 fixed sentences</td><td class="n">1,440</td><td class="n">24</td><td class="n">8</td></tr>
+<tr><td><b>CREMA-D</b></td><td>Crowd-sourced US actors, 12 sentences</td><td class="n">7,442</td><td class="n">91</td><td class="n">6</td></tr>
+<tr><td><b>TESS</b></td><td>Toronto, 2 women only, 200 words</td><td class="n">2,800</td><td class="n">2</td><td class="n">7</td></tr>
+<tr><td><b>SAVEE</b></td><td>Surrey, 4 men only</td><td class="n">480</td><td class="n">4</td><td class="n">7</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><b>RAVDESS is the project.</b> The other three came from the merge, and the
+counts already hint at the problem: CREMA-D has no <em>calm</em> and no
+<em>surprised</em>; TESS is 2,800 clips from just two people; SAVEE is four men.</p>
+
+<div class="note">
+<b>The 8 emotions.</b> neutral, calm, happy, sad, angry, fearful, disgust,
+surprised. Every emotion has 192 clips except neutral, which has 96 — the actors
+never recorded a "strongly neutral" version, because that isn't a thing.
+</div>
+
+<h3>Two flaws we found that his notebook didn't mention</h3>
+<ul class="plain">
+<li>One TESS file is recorded at <b>96 kHz</b> while the other 2,799 are at
+24 kHz — a packaging error in the original corpus.</li>
+<li><b>SAVEE is muffled.</b> Its audio carries almost no content above 3 kHz,
+where the other three reach 5.7 kHz. We checked it wasn't just because SAVEE is
+all-male — men in the other datasets sit at 5.7 kHz too. It's the recording
+chain. A model can spot SAVEE trivially.</li>
+</ul>
+</section>
+
+<!-- ============ 4. TRAIN / TEST ============ -->
+<section>
+<div class="eyebrow">Method</div>
+<h2>How we test — and why it's stricter than normal</h2>
+
+<p>You always split data into a <b>training</b> set (the model learns from it) and
+a <b>test</b> set (held back, used once to see if it actually learned). The
+question is <em>how</em> you split.</p>
+
+<div class="split">
+<div>
+<h4 style="color:var(--bad)">The tempting way</h4>
+<p style="font-size:.92rem">Shuffle all 1,440 clips, take 80% to train, 20% to
+test. Actor 07 appears in both halves.</p>
+<p style="font-size:.92rem">The model learns <em>"actor 07's angry voice sounds
+like this"</em> and scores brilliantly on actor 07's other angry clips. It has
+learned the <b>person</b>, not the emotion. On a new caller it falls apart.</p>
+</div>
+<div>
+<h4 style="color:var(--good)">What we do</h4>
+<p style="font-size:.92rem">Split by <b>actor</b>. The 24 actors go into 5 groups.
+Train on 4 groups, test on the 5th — voices the model has <em>never heard</em>.
+Repeat 5 times so every actor gets tested once.</p>
+<p style="font-size:.92rem">Harder, lower scores, but the number means something.</p>
+</div>
+</div>
+
+<div class="note warnbox">
+<b>We measured exactly how much the easy way inflates things: 8.8 points.</b>
+Same model, same features — shuffling instead of splitting by actor hands you
+almost nine free points that would vanish on a real customer. Any paper quoting
+a RAVDESS number without saying which split they used is probably quoting the
+inflated one.
+</div>
+
+<p><b>And we froze the split.</b> The exact actor-to-group assignment was fixed
+on 22 August and has not changed since — a test in the code refuses to let anyone
+overwrite it. That's what makes all five of our results comparable instead of
+five people quoting five different splits.</p>
+
+<div class="note">
+<b>Two scores, always both.</b> <b>Accuracy</b> = of 100 clips, how many were
+right. <b>Macro-F1</b> = the average score <em>per emotion</em>, so the model
+can't look good by nailing the 7 common emotions and ignoring neutral. We lead
+with macro-F1 because it's the honest one.
+</div>
+</section>
+
+<!-- ============ 5. PROGRESS ============ -->
+<section>
+<div class="eyebrow">Results</div>
+<h2>Where the score came from</h2>
+
+<figure>
+<div class="figtitle">Macro-F1 on unheard voices</div>
+<div class="bars" style="grid-template-columns:auto 1fr auto;">
+  <span class="lbl dim">Random guessing</span>
+  <span class="track"><span class="fill" style="width:12.5%;background:var(--muted)"></span></span>
+  <span class="val">0.125</span>
+
+  <span class="lbl">MFCC-40, first attempt</span>
+  <span class="track"><span class="fill" style="width:49.8%;background:var(--muted)"></span></span>
+  <span class="val">0.498</span>
+
+  <span class="lbl">Hand-built features, tuned</span>
+  <span class="track"><span class="fill alt" style="width:63.1%"></span></span>
+  <span class="val">0.631</span>
+
+  <span class="lbl"><b>wav2vec2 layer&nbsp;6</b></span>
+  <span class="track"><span class="fill" style="width:79.4%"></span></span>
+  <span class="val"><b>0.794</b></span>
+</div>
+<figcaption>Weeks of hand-designing audio features bought <b>+13 points</b>.
+Switching to a frozen pre-trained model bought <b>+16</b> — with a
+<em>simpler</em> classifier and no feature design at all.</figcaption>
+</figure>
+
+<div class="note">
+<b>MFCC</b> — the standard way to describe audio since the 1980s. You measure how
+much energy sits in each frequency band, on a scale tuned to human hearing, about
+30 numbers per clip. It's what we hand-built. It works; it just doesn't know
+anything about speech the way wav2vec2 does.
+</div>
+
+<h3>The honest range</h3>
+<p>We only have 24 speakers, so a number like 0.794 isn't exact. Ours is
+<b>0.794, somewhere between 0.748 and 0.836</b>. We now attach this range to
+every comparison — and it changed two things we'd already written up as results,
+which turned out to be indistinguishable from luck.</p>
+</section>
+
+<!-- ============ 6. MERGE ============ -->
+<section>
+<div class="eyebrow">The merged dataset</div>
+<h2>Adding the other three datasets makes it worse</h2>
+
+<p>We tested every possible combination. All of them lost.</p>
+
+<figure>
+<div class="figtitle">Change in macro-F1 when extra data is added to training</div>
+<div class="bars" style="grid-template-columns:auto 1fr auto">
+  <span class="lbl">RAVDESS alone</span>
+  <span class="track"><span class="fill" style="width:2px;background:var(--muted)"></span></span>
+  <span class="val">0.631</span>
+
+  <span class="lbl">+ SAVEE</span>
+  <span class="track"><span class="fill neg" style="width:15%"></span></span>
+  <span class="val">−1.8</span>
+
+  <span class="lbl">+ TESS + SAVEE</span>
+  <span class="track"><span class="fill neg" style="width:43%"></span></span>
+  <span class="val">−5.1</span>
+
+  <span class="lbl">+ TESS</span>
+  <span class="track"><span class="fill neg" style="width:44%"></span></span>
+  <span class="val">−5.2</span>
+
+  <span class="lbl">+ CREMA-D + SAVEE</span>
+  <span class="track"><span class="fill neg" style="width:80%"></span></span>
+  <span class="val">−9.5</span>
+
+  <span class="lbl">+ CREMA-D</span>
+  <span class="track"><span class="fill neg" style="width:87%"></span></span>
+  <span class="val">−10.4</span>
+
+  <span class="lbl">+ all three</span>
+  <span class="track"><span class="fill neg" style="width:93%"></span></span>
+  <span class="val">−11.1</span>
+
+  <span class="lbl">+ CREMA-D + TESS</span>
+  <span class="track"><span class="fill neg" style="width:100%"></span></span>
+  <span class="val">−11.9</span>
+</div>
+<figcaption>Bars run right-to-left: longer means worse. The damage tracks the
+<em>amount</em> of outside data almost perfectly (correlation −0.98).</figcaption>
+</figure>
+
+<p><b>Why.</b> Different studios, different microphones, different people. The
+model spends its capacity learning <em>those</em> differences instead of emotion.
+More data only helps when it's the same kind of data.</p>
+
+<h3>We then tried four standard fixes. None beat using none of it.</h3>
+<ul class="plain">
+<li><b>Count the extra data less.</b> Best case: an exact tie.</li>
+<li><b>Weight each outside clip by how RAVDESS-like it is.</b> Still 5 points worse.</li>
+<li><b>Only add data for emotions it helps.</b> Worst result of the whole project, −17 points.</li>
+<li><b>Let the computer choose how much to use</b>, deciding only from training
+data. It chose <b>zero, in all five rounds</b>.</li>
+</ul>
+
+<div class="note">
+<b>This is a finding, not a failure.</b> His merge is correctly built — we
+verified counts, checked for duplicates, decoded every file. A properly measured
+"no" is a real result, and the report is graded on measuring honestly rather than
+on getting a big number.
+</div>
+</section>
+
+<!-- ============ 7. WHAT IT GETS WRONG ============ -->
+<section>
+<div class="eyebrow">Error analysis</div>
+<h2>Where the model actually fails</h2>
+
+<figure>
+<div class="figtitle">Score per emotion</div>
+<div class="bars">
+  <span class="lbl">angry</span><span class="track"><span class="fill" style="width:87.3%"></span></span><span class="val">0.873</span>
+  <span class="lbl">disgust</span><span class="track"><span class="fill" style="width:86.3%"></span></span><span class="val">0.863</span>
+  <span class="lbl">surprised</span><span class="track"><span class="fill" style="width:85.2%"></span></span><span class="val">0.852</span>
+  <span class="lbl">fearful</span><span class="track"><span class="fill" style="width:82.4%"></span></span><span class="val">0.824</span>
+  <span class="lbl">calm</span><span class="track"><span class="fill" style="width:80.7%"></span></span><span class="val">0.807</span>
+  <span class="lbl">happy</span><span class="track"><span class="fill" style="width:74.8%"></span></span><span class="val">0.748</span>
+  <span class="lbl">neutral</span><span class="track"><span class="fill" style="width:73.0%"></span></span><span class="val">0.730</span>
+  <span class="lbl"><b>sad</b></span><span class="track"><span class="fill alt" style="width:65.8%"></span></span><span class="val"><b>0.658</b></span>
+</div>
+<figcaption>Loud, high-energy emotions are easy. <b>Sad is the weak spot</b> —
+and it used to be neutral, so the problem has moved.</figcaption>
+</figure>
+
+<figure>
+<div class="figtitle">What it confuses with what</div>
+<div class="scroll">
+<table class="cm">
+<thead><tr><th></th>
+<th>neu</th><th>calm</th><th>hap</th><th>sad</th><th>ang</th><th>fear</th><th>dis</th><th>sur</th></tr></thead>
+<tbody>
+<tr><th class="rowh">neutral</th>
+<td style="background:color-mix(in srgb,var(--s1) 72%,transparent);color:#fff">.72</td>
+<td style="background:color-mix(in srgb,var(--s1) 11%,transparent)">.11</td>
+<td style="background:color-mix(in srgb,var(--s1) 7%,transparent)">.07</td>
+<td style="background:color-mix(in srgb,var(--s1) 8%,transparent)">.08</td>
+<td style="background:var(--sunk)">.01</td><td style="background:var(--sunk)"></td>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)"></td></tr>
+<tr><th class="rowh">calm</th>
+<td style="background:color-mix(in srgb,var(--s1) 5%,transparent)">.05</td>
+<td style="background:color-mix(in srgb,var(--s1) 85%,transparent);color:#fff">.85</td>
+<td style="background:var(--sunk)">.01</td>
+<td style="background:color-mix(in srgb,var(--s2) 30%,transparent)">.09</td>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)"></td>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)"></td></tr>
+<tr><th class="rowh">happy</th>
+<td style="background:var(--sunk)">.02</td><td style="background:var(--sunk)">.02</td>
+<td style="background:color-mix(in srgb,var(--s1) 75%,transparent);color:#fff">.75</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:color-mix(in srgb,var(--s1) 5%,transparent)">.05</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:var(--sunk)">.02</td>
+<td style="background:color-mix(in srgb,var(--s2) 22%,transparent)">.06</td></tr>
+<tr><th class="rowh">sad</th>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:color-mix(in srgb,var(--s2) 55%,transparent)">.16</td>
+<td style="background:var(--sunk)">.03</td>
+<td style="background:color-mix(in srgb,var(--s1) 64%,transparent);color:#fff">.64</td>
+<td style="background:var(--sunk)">.01</td>
+<td style="background:color-mix(in srgb,var(--s2) 27%,transparent)">.08</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:var(--sunk)"></td></tr>
+<tr><th class="rowh">angry</th>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)"></td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:var(--sunk)">.01</td>
+<td style="background:color-mix(in srgb,var(--s1) 88%,transparent);color:#fff">.88</td>
+<td style="background:var(--sunk)">.01</td>
+<td style="background:var(--sunk)">.03</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td></tr>
+<tr><th class="rowh">fearful</th>
+<td style="background:var(--sunk)">.01</td><td style="background:var(--sunk)">.01</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:color-mix(in srgb,var(--s1) 5%,transparent)">.05</td>
+<td style="background:var(--sunk)">.03</td>
+<td style="background:color-mix(in srgb,var(--s1) 83%,transparent);color:#fff">.83</td>
+<td style="background:var(--sunk)">.02</td><td style="background:var(--sunk)">.02</td></tr>
+<tr><th class="rowh">disgust</th>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)">.01</td>
+<td style="background:var(--sunk)">.03</td>
+<td style="background:color-mix(in srgb,var(--s1) 6%,transparent)">.06</td>
+<td style="background:var(--sunk)">.02</td><td style="background:var(--sunk)">.01</td>
+<td style="background:color-mix(in srgb,var(--s1) 85%,transparent);color:#fff">.85</td>
+<td style="background:var(--sunk)">.01</td></tr>
+<tr><th class="rowh">surprised</th>
+<td style="background:var(--sunk)"></td><td style="background:var(--sunk)"></td>
+<td style="background:color-mix(in srgb,var(--s2) 28%,transparent)">.08</td>
+<td style="background:var(--sunk)"></td>
+<td style="background:var(--sunk)">.02</td>
+<td style="background:color-mix(in srgb,var(--s1) 4%,transparent)">.04</td>
+<td style="background:var(--sunk)">.02</td>
+<td style="background:color-mix(in srgb,var(--s1) 84%,transparent);color:#fff">.84</td></tr>
+</tbody>
+</table>
+</div>
+<div class="legend">
+  <span><i class="swatch" style="background:var(--s1)"></i> correct (down the diagonal)</span>
+  <span><i class="swatch" style="background:var(--s2)"></i> the confusions worth noticing</span>
+</div>
+<figcaption>Rows = true emotion, columns = what it guessed. <b>16% of sad clips
+are called calm</b>, and 9% of calm called sad — both are quiet and flat.
+That single pair causes about 1 in 6 of all mistakes. Happy↔surprised is the
+other one: both bright and rising.</figcaption>
+</figure>
+</section>
+
+<!-- ============ 8. RISKS ============ -->
+<section>
+<div class="eyebrow">Limitations</div>
+<h2>Three things that belong on the risk slide</h2>
+
+<h3>1. It identifies the speaker better than it reads emotion</h3>
+<p>We asked it to guess <em>which of the 24 actors</em> was talking. It got
+<b>94.9% right</b> — better than our old features managed (92.7%), and 23× better
+than chance. We assumed a smarter model would care less about who's speaking.
+The opposite happened. For a call-centre product that's a privacy question, and
+it should be said out loud rather than buried.</p>
+
+<h3>2. It's better at acting than at real speech</h3>
+<div class="bars" style="max-width:26rem">
+  <span class="lbl">dramatic delivery</span>
+  <span class="track"><span class="fill" style="width:73.9%"></span></span>
+  <span class="val">0.739</span>
+  <span class="lbl">normal delivery</span>
+  <span class="track"><span class="fill alt" style="width:68.1%"></span></span>
+  <span class="val">0.681</span>
+</div>
+<p style="margin-top:.8rem">Our actors recorded each emotion twice — once normally,
+once dramatically. <b>Nobody on a real support call is performing</b>, so the
+honest figure for a deployment is <b>0.681</b>, not the 0.794 headline. And even
+that is still acted speech.</p>
+
+<h3>3. It works better on women's voices</h3>
+<div class="bars" style="max-width:26rem">
+  <span class="lbl">female voices</span>
+  <span class="track"><span class="fill" style="width:83.9%"></span></span>
+  <span class="val">0.839</span>
+  <span class="lbl">male voices</span>
+  <span class="track"><span class="fill alt" style="width:75.0%"></span></span>
+  <span class="val">0.750</span>
+</div>
+<p style="margin-top:.8rem">A <b>8.8-point gap</b>. Our older approach had a
+12.8-point gap in the same direction — better technology shrank it but didn't
+remove it. It's appeared twice independently, so it's real, not luck. <b>The
+deck still quotes the old 12.8 figure and needs updating.</b></p>
+</section>
+
+<!-- ============ 9. NEXT ============ -->
+<section>
+<div class="eyebrow">Next</div>
+<h2>What's left, in priority order</h2>
+
+<div class="scroll">
+<table>
+<thead><tr><th>Idea</th><th>What it means</th><th>Worth it?</th></tr></thead>
+<tbody>
+<tr><td><b>Augmentation</b></td>
+<td>Make extra training clips by slightly speeding up, slowing down, or adding
+hiss to the ones we have. Gives the model more to learn from without new data.</td>
+<td style="color:var(--good)"><b>Best remaining idea.</b> It's been in the plan
+since Phase 6 and <em>nobody on the team has done it</em>.</td></tr>
+
+<tr><td><b>Make it forget who's speaking</b></td>
+<td>Train it so that a second model actively <em>fails</em> to identify the
+speaker. Directly attacks risk 1.</td>
+<td style="color:var(--good)">Strong novelty item for the report.</td></tr>
+
+<tr><td><b>Try WavLM</b></td>
+<td>A newer model of the same size, usually a bit better at emotion.</td>
+<td style="color:var(--warn)">Started, stopped — needs ~2 hrs and was
+overheating the laptop. Likely gains are too small for 24 speakers to detect.</td></tr>
+
+<tr><td><b>Update the deck</b></td>
+<td>Three numbers on it are stale; one good number is missing entirely.</td>
+<td style="color:var(--good)">Quick, and it's marked work.</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+<b>The missing good number:</b> the whole thing runs at <b>295 ms per clip on an
+ordinary laptop CPU</b> — no graphics card needed, about 12× faster than real
+time, ~75 MB deployed. That's a strong deployment story and it's currently
+nowhere in the slides.
+</div>
+</section>
+
+<footer>
+900+ experiments logged · 259 automated checks passing · test split frozen since
+22 Aug 2026 and byte-for-byte unchanged, so all five of our results stay
+comparable. Full detail in <code>docs/</code> in the repo.
+</footer>
+
+</div>

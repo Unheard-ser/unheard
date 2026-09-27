@@ -254,21 +254,26 @@ def extract(
             ``config.sr``, which would otherwise silently produce wrong
             numbers.
     """
-    import torch
-    from transformers import AutoFeatureExtractor, AutoModel
-
     config = config or EmbeddingConfig()
     if df is None:
         from ser.metadata import load as load_metadata
 
         df = load_metadata()
 
+    # The cache check comes before torch is imported, deliberately. Reading a
+    # cached tensor is pure numpy, and requiring a 2 GB deep-learning stack to
+    # hand back an array that is already on disk makes every downstream driver
+    # fail on a machine that cannot load torch -- which is not hypothetical
+    # here (see docs/environment.md on Windows Smart App Control).
     if use_cache and config.cache_path.is_file() and config.order_path.is_file():
         order = pd.read_parquet(config.order_path)
         if len(order) == len(df) and (
             order["filename"].to_numpy() == df["filename"].to_numpy()
         ).all():
             return np.load(config.cache_path, mmap_mode="r"), df
+
+    import torch
+    from transformers import AutoFeatureExtractor, AutoModel
 
     extractor = AutoFeatureExtractor.from_pretrained(config.model_id)
     if int(extractor.sampling_rate) != int(config.sr):
@@ -418,6 +423,146 @@ def select(
     if config.pooling == "std":
         return np.ascontiguousarray(std)
     return np.ascontiguousarray(np.concatenate([mean, std], axis=1))
+
+
+def extract_frames(
+    df: pd.DataFrame,
+    config: EmbeddingConfig | None = None,
+    layer: int = 6,
+    progress: bool = True,
+):
+    """Yield **per-frame** hidden states, for models that attend over time.
+
+    `extract` pools each clip to a mean and a standard deviation, which is what
+    a fixed-length classifier needs and is useless to anything with attention:
+    pooling is precisely the step attention is meant to replace. This is the
+    escape hatch.
+
+    Streaming rather than cached, deliberately. One layer of frame-level states
+    for the merged corpus is ``12,162 x ~180 x 768 x 4 bytes`` -- about 6.7 GB,
+    and every layer would be 87 GB. RAVDESS alone at one layer is ~820 MB, which
+    `cache_frames` will materialise if you want random access; for a training
+    loop, iterate this instead and keep nothing.
+
+    Args:
+        df: Frame with ``filepath``, in the order batches should arrive.
+        config: Embedding configuration. ``config.layer`` is ignored -- pass
+            ``layer`` explicitly, since the point here is one layer at a time.
+        layer: Which hidden state to return. Defaults to 6, the Phase 13 winner.
+        progress: Show a progress bar.
+
+    Yields:
+        ``(states, lengths, filenames)`` per batch, where ``states`` is a
+        float32 array ``(batch, max_frames, dim)`` **zero-padded on the right**
+        and ``lengths`` gives each clip's real frame count.
+
+        **Use the lengths.** Clips differ in duration, so the padding is real
+        and an attention layer that does not mask it will happily attend to
+        silence that is not in the audio. Build a mask as
+        ``torch.arange(max_frames)[None, :] < lengths[:, None]`` and add
+        ``-inf`` to the scores where it is False.
+    """
+    import torch
+    from transformers import AutoFeatureExtractor, AutoModel
+
+    config = config or EmbeddingConfig()
+    extractor = AutoFeatureExtractor.from_pretrained(config.model_id)
+    if int(extractor.sampling_rate) != int(config.sr):
+        raise ValueError(
+            f"{config.model_id} expects {extractor.sampling_rate} Hz, config says {config.sr}"
+        )
+    model = AutoModel.from_pretrained(config.model_id)
+    model.eval()
+
+    paths = df["filepath"].tolist()
+    names = df["filename"].tolist()
+    batches = range(0, len(paths), config.batch_size)
+    if progress:
+        from tqdm.auto import tqdm
+
+        batches = tqdm(batches, desc=f"frames L{layer}", unit="batch")
+
+    for start in batches:
+        chunk = paths[start : start + config.batch_size]
+        signals = [load_signal(p, config) for p in chunk]
+        inputs = extractor(
+            signals, sampling_rate=config.sr, return_tensors="pt",
+            padding=True, return_attention_mask=True,
+        )
+        with torch.inference_mode():
+            result = model(**inputs, output_hidden_states=True)
+
+        states = result.hidden_states[layer]
+        mask = _frame_mask(model, inputs, states.shape[1])
+        yield (
+            states.to(torch.float32).numpy(),
+            mask.sum(dim=1).to(torch.int32).numpy(),
+            names[start : start + config.batch_size],
+        )
+
+
+def cache_frames(
+    df: pd.DataFrame,
+    config: EmbeddingConfig | None = None,
+    layer: int = 6,
+    path: Path | None = None,
+    max_frames: int = 320,
+):
+    """Materialise one layer of frame-level states to a ``.npy`` for random access.
+
+    Worth it for RAVDESS (~820 MB at layer 6) when a training loop needs to
+    shuffle clips across epochs; not worth it for the merged corpus. Written as
+    a memmap so a caller can slice a batch without loading the whole file.
+
+    Args:
+        df: Frame with ``filepath`` and ``filename``.
+        config: Embedding configuration.
+        layer: Which hidden state to store.
+        path: Destination ``.npy``. Defaults to a hash-derived name beside the
+            pooled caches.
+        max_frames: Clips are padded or truncated to this many frames. 320 is
+            ~6.4 s at wav2vec2's 50 frames/s, comfortably above RAVDESS's 5.3 s
+            maximum; anything longer is truncated and reported.
+
+    Returns:
+        ``(array, lengths, filenames)`` where ``array`` is a memmap of shape
+        ``(len(df), max_frames, dim)`` and ``lengths`` the true frame counts.
+    """
+    config = config or EmbeddingConfig()
+    target = (
+        Path(path) if path is not None
+        else CACHE_DIR / f"frames_{config.hash}_L{layer}.npy"
+    )
+    lengths_path = target.with_name(target.stem + "_lengths.npy")
+
+    if target.is_file() and lengths_path.is_file():
+        return (
+            np.load(target, mmap_mode="r"),
+            np.load(lengths_path),
+            df["filename"].tolist(),
+        )
+
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    array, lengths, cursor, truncated = None, [], 0, 0
+
+    for states, frame_counts, _ in extract_frames(df, config, layer):
+        if array is None:
+            array = np.lib.format.open_memmap(
+                target, mode="w+", dtype=np.float32,
+                shape=(len(df), max_frames, states.shape[-1]),
+            )
+        take = min(states.shape[1], max_frames)
+        array[cursor : cursor + len(states), :take] = states[:, :take]
+        truncated += int((frame_counts > max_frames).sum())
+        lengths.extend(np.minimum(frame_counts, max_frames).tolist())
+        cursor += len(states)
+
+    array.flush()
+    lengths = np.asarray(lengths, dtype=np.int32)
+    np.save(lengths_path, lengths)
+    if truncated:
+        print(f"note: {truncated} clips exceeded {max_frames} frames and were truncated")
+    return np.load(target, mmap_mode="r"), lengths, df["filename"].tolist()
 
 
 def feature_names(dim: int, pooling: str) -> list[str]:
