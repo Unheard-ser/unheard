@@ -8,3 +8,9 @@ __pycache__/
 
 # Personal working notes — kept locally, not shared
 PROGRESS_TILL_NOW.md
+
+# External corpora (CREMA-D / TESS / SAVEE) and the merged index.
+# Audio is never committed (rule 7); the index is regenerable from it.
+data_external/
+data_standardized/
+data_augmented/

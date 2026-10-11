@@ -15,8 +15,11 @@ from ser import SEED, set_seeds
 from ser.features import (
     DEFAULT_DELTA_CONTEXT_MS,
     FeatureConfig,
+    apply_scaler,
     extract_one,
     feature_columns,
+    fit_scaler,
+    per_speaker_normalise,
 )
 from ser.metadata import DATA_ROOT
 
@@ -221,3 +224,64 @@ def test_unknown_aggregation_and_normalisation_raise():
 def test_aggregation_controls_feature_count(aggregation, expected):
     vector, columns = extract_one(CLIP, FeatureConfig(aggregation=aggregation))
     assert len(vector) == len(columns) == expected
+
+
+# --- per-speaker normalisation (the rule-2 carve-out) ----------------------
+
+
+def test_per_speaker_normalise_zeroes_each_speaker_mean():
+    rng = np.random.default_rng(0)
+    # Two speakers with deliberately different offsets and scales.
+    matrix = np.vstack([rng.normal(100, 5, (20, 4)), rng.normal(-50, 20, (20, 4))])
+    speakers = np.array([1] * 20 + [2] * 20)
+
+    out = per_speaker_normalise(matrix, speakers)
+
+    for speaker in (1, 2):
+        block = out[speakers == speaker]
+        assert np.allclose(block.mean(axis=0), 0.0, atol=1e-8)
+        assert np.allclose(block.std(axis=0), 1.0, atol=1e-6)
+
+
+def test_per_speaker_normalise_uses_no_labels():
+    """The carve-out is only defensible because it consumes audio, not labels.
+
+    Signature check: the function takes a matrix and speaker ids. There is
+    no parameter it could read an emotion from.
+    """
+    import inspect
+
+    params = set(inspect.signature(per_speaker_normalise).parameters)
+    assert params == {"matrix", "speakers", "eps"}
+
+
+def test_per_speaker_normalise_survives_a_constant_feature():
+    """A speaker with zero variance must not produce inf or nan."""
+    matrix = np.array([[1.0, 5.0], [1.0, 7.0], [1.0, 9.0]])
+    out = per_speaker_normalise(matrix, np.array([3, 3, 3]))
+    assert np.isfinite(out).all()
+    assert np.allclose(out[:, 0], 0.0)
+
+
+def test_per_speaker_normalise_rejects_mismatched_lengths():
+    with pytest.raises(ValueError, match="speakers has"):
+        per_speaker_normalise(np.zeros((5, 2)), np.array([1, 2]))
+
+
+def test_fit_scaler_redirects_per_speaker_to_the_right_function():
+    with pytest.raises(ValueError, match="per_speaker_normalise"):
+        fit_scaler(np.zeros((4, 2)), "per_speaker")
+
+
+def test_global_scaler_is_fit_on_train_rows_only():
+    train = np.array([[0.0], [10.0]])
+    test = np.array([[100.0]])
+    scaler = fit_scaler(train, "global")
+    assert scaler.mean_[0] == pytest.approx(5.0)   # test row not seen
+    assert apply_scaler(scaler, test)[0, 0] > 10   # so it scales far out
+
+
+def test_fit_scaler_none_is_a_passthrough():
+    matrix = np.array([[1.0, 2.0]])
+    assert fit_scaler(matrix, "none") is None
+    assert np.array_equal(apply_scaler(None, matrix), matrix)

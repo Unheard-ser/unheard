@@ -1,0 +1,57 @@
+# Speech emotion recognition -- pinned environment.
+#
+# These are the versions actually resolved and verified on Python 3.14.4, not a
+# loose range. Feature values have to be comparable across machines, and a
+# different librosa or numpy minor can shift an MFCC in the last decimal place;
+# that is enough to make two people's results disagree for no real reason.
+#
+#   python -m venv .venv
+#   .venv/Scripts/activate          # Windows;  source .venv/bin/activate on Unix
+#   pip install -r requirements.txt
+
+# --- audio -----------------------------------------------------------------
+librosa==1.0.0
+soundfile==0.14.0
+
+# --- numerics and modelling ------------------------------------------------
+numpy==2.5.2
+pandas==3.0.5
+scikit-learn==1.9.0
+scipy==1.18.1
+joblib==1.5.3
+xgboost==3.4.1
+
+# pandas reads and writes the intermediate caches through pyarrow. Pinned to
+# 25.0.0 and not a later build: on Windows, 25.0.1 ships a compiled extension
+# that Smart App Control refuses to load, which takes pandas down with it.
+pyarrow==25.0.0
+
+# --- figures ---------------------------------------------------------------
+matplotlib==3.11.1
+seaborn==0.13.2
+umap-learn==0.5.12
+
+# --- external corpora (CREMA-D, TESS, SAVEE) -------------------------------
+requests==2.34.2
+tqdm==4.70.0
+kagglehub==1.0.2
+
+# --- notebooks -------------------------------------------------------------
+jupyterlab==4.6.3
+nbformat==5.11.1
+nbconvert==7.17.1
+ipykernel==7.3.0
+
+# --- tests -----------------------------------------------------------------
+pytest==9.1.1
+
+# --- wav2vec2 (optional, ~2 GB) --------------------------------------------
+# Needed only to extract embeddings or train the CNN. Everything else in this
+# submission runs without them, because ser_lib imports torch inside the
+# functions that use it rather than at module load. Install separately:
+#
+#   pip install torch==2.13.0 transformers==5.15.1
+#
+# On Windows CPU the wheel carries a "+cpu" local version tag
+# (torch==2.13.0+cpu) which does not resolve on Linux, so it is deliberately
+# not pinned in this file.

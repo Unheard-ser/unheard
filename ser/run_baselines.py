@@ -17,7 +17,12 @@ import numpy as np
 import pandas as pd
 
 from ser.evaluate import evaluate, evaluate_pooled
-from ser.features import FeatureConfig, extract, feature_columns
+from ser.features import (
+    FeatureConfig,
+    extract,
+    feature_columns,
+    per_speaker_normalise,
+)
 from ser.metadata import load as load_metadata
 from ser.models.classical import build, default_hyperparams
 from ser.splits import get_split, load_folds
@@ -52,7 +57,11 @@ def run(
     columns = feature_columns(frame, meta)
 
     indexed = frame.set_index("filename")
-    x_all = indexed[columns]
+    values = indexed[columns].to_numpy()
+    if config.normalisation == "per_speaker":
+        # Documented exception to rule 2 -- see ser.features.per_speaker_normalise.
+        values = per_speaker_normalise(values, indexed["actor"].to_numpy())
+    x_all = pd.DataFrame(values, index=indexed.index, columns=columns)
     y_all = indexed["emotion_label"]
     folds = load_folds()
 

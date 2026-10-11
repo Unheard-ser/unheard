@@ -17,20 +17,53 @@ Business framing: contact-centre / telecaller QA and CSAT prediction.
    Every experiment by every
    team member uses those exact fold assignments. This is the contract that makes
    five people's results comparable. If you believe a split is wrong, stop and ask.
-2. **Never fit anything on test data.** Scalers, PCA, feature selection, class
-   weights, and per-speaker statistics are fit on the training fold only and applied
-   to the held-out fold. No exceptions.
+   **Amended 2026-09-22 (external corpora).** `folds.csv` remains frozen and
+   byte-identical; `tests/test_splits_merged.py` hashes it either side of every
+   merged-corpus operation. The merged corpus gets its own write-once file,
+   `splits/folds_merged.csv`, under the same guard. Adding a second fold file
+   does not relax the first.
+2. **Never fit anything on test data.** Scalers, PCA, feature selection and class
+   weights are fit on the training fold only and applied to the held-out fold.
+   **One stated exception:** per-speaker normalisation (`per_speaker_normalise`)
+   computes a held-out speaker's statistics from their own clips, because under
+   `speaker_independent` that speaker has no training clips at all. It consumes
+   no labels — only audio, which is equally available at deployment — and is
+   standard CMVN practice. It is transductive; `docs/feature_findings.md` §3
+   states this openly. No other exception exists; add one only by amending
+   this rule, never silently.
 3. **Augmentation applies to training folds only.** Never to held-out data.
 4. **Speaker-independent is the primary protocol.** Random-stratified is run only
    as a deliberate comparison to quantify leakage. Never report the random-split
-   number alone.
+   number alone. **Amended 2026-09-22:** on the merged corpus the cross-corpus
+   protocol is `corpus_holdout` (leave-one-corpus-out). It is the only protocol
+   where recording conditions differ between train and test, so it is the honest
+   generalisation number and must be reported alongside
+   `speaker_independent_merged`, never replaced by it.
 5. **Every run appends a row to `results/results.csv`.** No result exists unless
    it is logged there.
 6. **Fix all random seeds.** `SEED = 42`, set for numpy, sklearn, torch, and the
    Python hash seed.
 7. **Never commit audio files.** `data/` is gitignored. Never commit
-   `features/*.parquet` either — they are regenerable.
+   `features/*.parquet` either — they are regenerable. **Amended 2026-09-22:**
+   `data_external/` (CREMA-D, TESS, SAVEE and the built `dataset_index.csv`)
+   and the `features/w2v_*.npy` embedding caches are gitignored on the same
+   grounds. The embedding caches run to ~1 GB.
 8. If execution diverges from the approved plan, stop and re-enter plan mode.
+9. **External corpora enter training, never the headline test set.** Added
+   2026-09-22, when a teammate's merge of CREMA-D + TESS + SAVEE arrived.
+   Two architectures exist and both are reported:
+   - **A (headline candidate).** Test side is the frozen RAVDESS
+     `speaker_independent` fold, unchanged; external clips are added to the
+     *training* side only (`ser.splits_merged.augmented_train`). The 8-class
+     problem stays intact, results stay comparable to the 0.6333 floor, and the
+     `calm` shortcut is neutralised by construction — every test clip is
+     RAVDESS, so corpus identity is constant on the test set and carries zero
+     information. A test asserts the test side contains no external clip.
+   - **B.** New folds over all 12,162 clips (`splits/folds_merged.csv`).
+   **B's numbers are never printed beside A's without stating that the
+   denominators differ.** Which becomes the headline is decided by the
+   criterion pre-registered in `docs/merged_corpus_design.md`, written before
+   any result existed — not chosen afterwards.
 
 ## Repo layout
 
@@ -39,9 +72,14 @@ ser/
   metadata.py      parse the 5-field filename into a DataFrame (see Data facts)
   preprocess.py    load_audio() — THE single audio entry point: mono + 16 kHz
   audit.py         integrity checks on the raw audio
-  eda.py           plotting functions (return figures, never call plt.show)
+  eda.py           EDA measurement + plots (return figures, never plt.show);
+                   training_subset() is the guard -- signal analysis is
+                   TRAINING FOLDS ONLY
+  run_eda.py       Phase 2 driver -> figures/ + docs/eda_findings.md
   splits.py        4 protocols — FROZEN in splits/folds.csv, never regenerate
   features.py      feature extraction, parameterised (see below)
+  run_ablation.py  Phase 4 one-axis-at-a-time grid -> docs/feature_findings.md
+  run_baselines.py fit + score a config across protocols and models
   evaluate.py      the single scoring function everyone calls
   models/          one module per model family
 notebooks/         exploration and figures only — no logic lives here

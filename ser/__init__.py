@@ -41,9 +41,16 @@ def set_seeds(seed: int = SEED) -> None:
 
     np.random.seed(seed)
 
-    try:  # pragma: no cover - torch arrives in Phase 6
+    # ImportError covers torch simply not being installed -- it lives in
+    # requirements-deep.txt, so a classical-only environment is expected and
+    # fine. OSError covers torch being *present but unloadable*: on Windows,
+    # Smart App Control blocks its unsigned DLLs with WinError 4551, which is
+    # an OSError, not an ImportError. Catching only the latter turned a seeding
+    # call into a hard crash for every driver in the project, including the
+    # ones that never touch torch. See docs/environment.md.
+    try:  # pragma: no cover - depends on the local environment
         import torch
-    except ImportError:
+    except (ImportError, OSError):
         return
     torch.manual_seed(seed)
     if torch.cuda.is_available():

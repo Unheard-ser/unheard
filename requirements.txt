@@ -1,14 +1,31 @@
-# Phase 0-5 dependencies. Pinned to the versions resolved on Python 3.14.4.
-# torch / transformers are deliberately absent -- they arrive in Phase 6.
+# Pinned to the versions resolved on Python 3.14.4. Match them exactly --
+# feature values must be comparable across all five machines.
 librosa==1.0.0
 soundfile==0.14.0
 numpy==2.5.2
 pandas==3.0.5
 scikit-learn==1.9.0
+# Pinned explicitly rather than left to sklearn's resolver: scipy ships
+# unsigned compiled extensions, and which build lands decides whether Windows
+# Smart App Control will load them at all. See docs/environment.md.
+scipy==1.18.1
+joblib==1.5.3
 matplotlib==3.11.1
 seaborn==0.13.2
 pyarrow==25.0.1
 pytest==9.1.1
+xgboost==3.4.1
+umap-learn==0.5.12
+
+# Phase 9: fetching CREMA-D / TESS / SAVEE.
+requests==2.34.2
+tqdm==4.70.0
+kagglehub==1.0.2
+
+# Deep-learning dependencies live in requirements-deep.txt, not here. They are
+# ~2 GB, and CI needs none of them: `ser.embeddings` imports torch inside its
+# functions, so its tests run without it. Keeping them separate also avoids the
+# `+cpu` local version specifier, which does not resolve on CI's Linux runner.
 
 # Notebook tooling -- needed to run and re-execute notebooks/
 jupyterlab==4.6.3
